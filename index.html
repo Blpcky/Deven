@@ -3,93 +3,157 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Deven Ballback's Skin Game</title>
-<meta name="description" content="Deven Ballback's personal website — an interactive skin-changing playground at devenballback.skin.">
+<title>Deven Ballback</title>
+<meta name="description" content="Deven Ballback's personal site. Collector of skins.">
 <link rel="canonical" href="https://devenballback.skin/">
-<meta property="og:title" content="Deven Ballback's Skin Game">
-<meta property="og:description" content="Deven Ballback's personal website — an interactive skin-changing playground.">
+<meta property="og:title" content="Deven Ballback">
+<meta property="og:description" content="Deven Ballback's personal site. Collector of skins.">
 <meta property="og:url" content="https://devenballback.skin/">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Deven Ballback's Skin Game">
-<meta name="twitter:description" content="Deven Ballback's personal website.">
-<style>
-  .visually-hidden {
-    position: absolute;
-    width: 1px; height: 1px;
-    padding: 0; margin: -1px;
-    overflow: hidden;
-    clip: rect(0,0,0,0);
-    white-space: nowrap;
-    border: 0;
-  }
-</style>
+<meta name="twitter:title" content="Deven Ballback">
+<meta name="twitter:description" content="Deven Ballback's personal site. Collector of skins.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg1: #3a2818;
-    --bg2: #0c0805;
-    --accent: #ffb98a;
+    --forest-deep: #122A20;
+    --forest: #1E4432;
+    --sage: #B7CFB6;
+    --cream: #F2EEE1;
+    --gold: #C9A855;
+    --ink: #0B1712;
+    --accent: #C9A855;
     color-scheme: dark;
   }
+  * { box-sizing: border-box; }
   html, body {
     margin: 0;
-    height: 100%;
-    overflow: hidden;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    cursor: default;
+    min-height: 100%;
+    background: var(--forest-deep);
+    color: var(--cream);
+    font-family: 'Manrope', sans-serif;
+    line-height: 1.55;
   }
   body {
-    position: relative;
-    background: radial-gradient(circle at 50% 50%, var(--bg1), var(--bg2) 70%);
-    transition: background 0.6s ease;
-  }
-
-  #blob {
-    position: absolute;
-    top: 0; left: 0;
-    font-size: clamp(40px, 9vw, 96px);
-    line-height: 1;
-    white-space: nowrap;
-    user-select: none;
-    will-change: transform;
-    filter: drop-shadow(0 0 18px var(--accent));
-    transition: filter 0.4s ease;
-  }
-
-  #counter {
-    position: absolute;
-    top: 18px;
-    right: 26px;
-    color: var(--accent);
-    font-size: 34px;
-    font-weight: 700;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    user-select: none;
-    transition: color 0.6s ease;
-  }
-
-  #skindexbtn {
-    position: absolute;
-    top: 14px;
-    left: 18px;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.18);
-    color: var(--accent);
-    font-size: 30px;
-    line-height: 1;
-    width: 62px;
-    height: 62px;
-    border-radius: 999px;
-    cursor: pointer;
-    backdrop-filter: blur(6px);
-    transition: background 0.2s ease, transform 0.15s ease, color 0.6s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 10;
+    padding: 64px 24px;
+    position: relative;
+    overflow-x: hidden;
   }
-  #skindexbtn:hover { background: rgba(255,255,255,0.16); transform: translateY(-1px); }
-  #skindexbtn:active { transform: translateY(0) scale(0.92); }
+  .wrap {
+    width: 100%;
+    max-width: 460px;
+    text-align: center;
+  }
+  .eyebrow {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--sage);
+    opacity: 0.7;
+    margin-bottom: 18px;
+  }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-style: italic;
+    font-size: clamp(34px, 7vw, 48px);
+    letter-spacing: -0.01em;
+    margin: 0 0 10px;
+  }
+  .tagline {
+    color: var(--sage);
+    font-size: 15px;
+    margin: 0 0 40px;
+  }
+
+  /* ---------- avatar ---------- */
+  #avatar-frame {
+    width: 132px;
+    height: 132px;
+    margin: 0 auto 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 62px;
+    background: radial-gradient(circle at 50% 40%, rgba(255,255,255,0.06), transparent 70%);
+    border: 1.5px solid color-mix(in srgb, var(--accent) 55%, transparent);
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.04) inset, 0 0 36px -6px var(--accent);
+    cursor: pointer;
+    user-select: none;
+    transition: border-color 0.5s ease, box-shadow 0.5s ease, transform 0.15s ease;
+  }
+  #avatar-frame:active { transform: scale(0.96); }
+  #avatar-stat {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 12.5px;
+    color: var(--sage);
+    opacity: 0.75;
+    margin-bottom: 34px;
+    transition: color 0.5s ease;
+  }
+  #avatar-stat b { color: var(--accent); font-weight: 600; transition: color 0.5s ease; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Manrope', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    background: var(--accent);
+    border: none;
+    padding: 13px 26px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: transform 0.15s ease, filter 0.15s ease;
+  }
+  .btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
+  .btn:active { transform: translateY(0) scale(0.98); }
+
+  .links {
+    margin-top: 44px;
+    display: flex;
+    justify-content: center;
+    gap: 22px;
+    flex-wrap: wrap;
+  }
+  .links a {
+    font-size: 13px;
+    color: var(--sage);
+    opacity: 0.75;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: opacity 0.2s ease, border-color 0.2s ease;
+  }
+  .links a:hover { opacity: 1; border-color: var(--sage); }
+
+  /* ---------- toast ---------- */
+  #toast {
+    position: fixed;
+    top: 24px;
+    left: 50%;
+    transform: translate(-50%, -14px);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 13.5px;
+    color: var(--ink);
+    background: var(--accent);
+    padding: 10px 18px;
+    border-radius: 10px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    white-space: nowrap;
+    z-index: 20;
+    font-weight: 600;
+  }
+  #toast.show { opacity: 1; transform: translate(-50%, 0); }
 
   .particle {
     position: fixed;
@@ -97,56 +161,15 @@
     pointer-events: none;
     top: 0; left: 0;
     will-change: transform, opacity;
-  }
-
-  .peel {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 4;
-    opacity: 0;
-  }
-  .peel.show {
-    animation: peelOff 0.7s ease forwards;
-  }
-  @keyframes peelOff {
-    0%   { opacity: 0.9; clip-path: inset(0 0 0 0); }
-    100% { opacity: 0; clip-path: inset(0 100% 0 0); }
-  }
-
-  /* ---------- unlock toast ---------- */
-  #toast {
-    position: fixed;
-    top: 14%;
-    left: 50%;
-    transform: translate(-50%, -12px);
-    font-size: 15px;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    letter-spacing: 0.02em;
-    color: #fff;
-    background: rgba(0,0,0,0.55);
-    border: 1px solid rgba(255,255,255,0.2);
-    padding: 10px 16px;
-    border-radius: 10px;
-    backdrop-filter: blur(6px);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    text-align: center;
-    white-space: nowrap;
-    z-index: 20;
-  }
-  #toast.show {
-    opacity: 1;
-    transform: translate(-50%, 0);
+    z-index: 5;
   }
 
   /* ---------- skindex overlay ---------- */
   #skindex-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.72);
-    backdrop-filter: blur(8px);
+    background: rgba(6, 12, 9, 0.85);
+    backdrop-filter: blur(10px);
     z-index: 30;
     display: flex;
     align-items: center;
@@ -155,29 +178,25 @@
     pointer-events: none;
     transition: opacity 0.25s ease;
     overflow-y: auto;
-    padding: 40px 16px;
+    padding: 40px 20px;
   }
-  #skindex-overlay.show {
-    opacity: 1;
-    pointer-events: auto;
-  }
-  #skindex-panel {
-    width: min(560px, 100%);
-    color: #eee;
-    text-align: center;
-  }
+  #skindex-overlay.show { opacity: 1; pointer-events: auto; }
+  #skindex-panel { width: min(520px, 100%); text-align: center; }
   #skindex-panel h2 {
-    font-size: 22px;
-    letter-spacing: 0.12em;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 26px;
     margin: 0 0 4px;
     color: var(--accent);
-    transition: color 0.6s ease;
+    transition: color 0.5s ease;
   }
   #skindex-sub {
-    font-size: 13px;
-    color: #999;
+    font-size: 12.5px;
+    color: var(--sage);
+    opacity: 0.7;
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    margin-bottom: 22px;
+    margin-bottom: 26px;
   }
   #skindex-grid {
     display: grid;
@@ -185,10 +204,10 @@
     gap: 12px;
   }
   .skindex-tile {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.14);
-    border-radius: 12px;
-    padding: 14px 8px 10px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 14px;
+    padding: 16px 8px 12px;
     cursor: pointer;
     transition: background 0.2s ease, transform 0.15s ease, border-color 0.2s ease;
     display: flex;
@@ -196,46 +215,51 @@
     align-items: center;
     gap: 6px;
   }
-  .skindex-tile:hover { background: rgba(255,255,255,0.12); transform: translateY(-2px); }
+  .skindex-tile:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
   .skindex-tile.active { border-color: var(--accent); }
-  .skindex-tile.locked { cursor: default; opacity: 0.55; }
-  .skindex-tile.locked:hover { background: rgba(255,255,255,0.06); transform: none; }
-  .skindex-emoji { font-size: 34px; line-height: 1; }
-  .skindex-name {
-    font-size: 11px;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    color: #ccc;
-  }
-  .skindex-lock {
-    font-size: 10px;
-    color: #888;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  }
+  .skindex-tile.locked { cursor: default; opacity: 0.5; }
+  .skindex-tile.locked:hover { background: rgba(255,255,255,0.05); transform: none; }
+  .skindex-emoji { font-size: 32px; line-height: 1; }
+  .skindex-name { font-size: 11px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--cream); opacity: 0.85; }
+  .skindex-lock { font-size: 10px; color: var(--sage); opacity: 0.6; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
   #skindex-close {
-    margin-top: 26px;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.18);
-    color: #eee;
+    margin-top: 28px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: var(--cream);
     font-size: 13px;
-    font-family: inherit;
-    padding: 9px 20px;
+    font-family: 'Manrope', sans-serif;
+    padding: 10px 22px;
     border-radius: 999px;
     cursor: pointer;
+    transition: background 0.2s ease;
   }
-  #skindex-close:hover { background: rgba(255,255,255,0.16); }
+  #skindex-close:hover { background: rgba(255,255,255,0.08); }
 </style>
 </head>
 <body>
-  <h1 class="visually-hidden">Deven Ballback's Skin Game</h1>
-  <p class="visually-hidden">The personal website of Deven Ballback, at devenballback.skin. Click around to earn clicks and unlock new skins in the Skindex.</p>
-  <button id="skindexbtn" title="open Skindex">📖</button>
-  <div id="counter">0</div>
-  <div id="blob"></div>
   <div id="toast"></div>
+
+  <div class="wrap">
+    <div class="eyebrow">devenballback.skin</div>
+    <h1>Deven Ballback</h1>
+    <p class="tagline">Collector of skins. Ballback by trade.</p>
+
+    <div id="avatar-frame" title="click to earn progress"></div>
+    <div id="avatar-stat"><b id="skin-name"></b> · <span id="click-count">0</span> clicks</div>
+
+    <button class="btn" id="skindexbtn">Open Skindex</button>
+
+    <div class="links">
+      <a href="https://deven.autos" target="_blank" rel="noopener">deven.autos</a>
+      <a href="https://intervention.website" target="_blank" rel="noopener">intervention.website</a>
+      <a href="https://github.com/Blpcky" target="_blank" rel="noopener">github</a>
+    </div>
+  </div>
 
   <div id="skindex-overlay">
     <div id="skindex-panel">
-      <h2>SKINDEX</h2>
+      <h2>Skindex</h2>
       <div id="skindex-sub"></div>
       <div id="skindex-grid"></div>
       <button id="skindex-close">close</button>
@@ -244,83 +268,60 @@
 
 <script>
 (function () {
-  // ---------- skin roster ----------
-  // A diverse cast of humans — different ages, features, and skin tones —
-  // unlocked progressively the more you click around.
   var skins = [
-    { id: 0, name: "Skin #01", emoji: "🧑🏻", unlockAt: 0,     bg1: "#3a2818", bg2: "#0c0805", accent: "#ffb98a", particles: ["#ffb98a", "#e69a63", "#ffd9b8", "#c97a3f"] },
-    { id: 1, name: "Skin #02", emoji: "🧑🏼", unlockAt: 100,   bg1: "#3a2f05", bg2: "#0a0700", accent: "#f2c14e", particles: ["#f2c14e", "#d9a52e", "#ffe08a", "#a67c1a"] },
-    { id: 2, name: "Skin #03", emoji: "🧑🏽", unlockAt: 300,   bg1: "#3a1010", bg2: "#0a0303", accent: "#ff6b6b", particles: ["#ff6b6b", "#e04545", "#ff9e9e", "#b32c2c"] },
-    { id: 3, name: "Skin #04", emoji: "🧑🏾", unlockAt: 750,   bg1: "#22103a", bg2: "#06020a", accent: "#9d7fff", particles: ["#9d7fff", "#7d5be0", "#c6b3ff", "#5a3dbf"] },
-    { id: 4, name: "Skin #05", emoji: "🧑🏿", unlockAt: 1500,  bg1: "#0a2e2c", bg2: "#020807", accent: "#4bd2c9", particles: ["#4bd2c9", "#2ea89f", "#8cf0e6", "#1c7e77"] },
-    { id: 5, name: "Skin #06", emoji: "👶🏽", unlockAt: 3000,  bg1: "#3a1028", bg2: "#0a0208", accent: "#ff8fc7", particles: ["#ff8fc7", "#e0609f", "#ffc2e0", "#b83d7c"] },
-    { id: 6, name: "Skin #07", emoji: "🧓🏻", unlockAt: 5500,  bg1: "#1c1c1c", bg2: "#050505", accent: "#cfd8dc", particles: ["#cfd8dc", "#90a4ae", "#eceff1", "#607d8b"] },
-    { id: 7, name: "Skin #08", emoji: "🧔🏾", unlockAt: 9000,  bg1: "#2f2205", bg2: "#080601", accent: "#d99a3d", particles: ["#d99a3d", "#b87c22", "#f0c57a", "#8f5f14"] },
-    { id: 8, name: "Skin #09", emoji: "🧑🏿‍🦱", unlockAt: 15000, bg1: "#3a0c14", bg2: "#0a0204", accent: "#ff4d6d", particles: ["#ff4d6d", "#d92e4d", "#ff8fa3", "#a3132c"] }
+    { id: 0, name: "Skin #01", emoji: "🧑🏻", unlockAt: 0,     accent: "#ffb98a", particles: ["#ffb98a", "#e69a63", "#ffd9b8", "#c97a3f"] },
+    { id: 1, name: "Skin #02", emoji: "🧑🏼", unlockAt: 100,   accent: "#f2c14e", particles: ["#f2c14e", "#d9a52e", "#ffe08a", "#a67c1a"] },
+    { id: 2, name: "Skin #03", emoji: "🧑🏽", unlockAt: 300,   accent: "#ff6b6b", particles: ["#ff6b6b", "#e04545", "#ff9e9e", "#b32c2c"] },
+    { id: 3, name: "Skin #04", emoji: "🧑🏾", unlockAt: 750,   accent: "#9d7fff", particles: ["#9d7fff", "#7d5be0", "#c6b3ff", "#5a3dbf"] },
+    { id: 4, name: "Skin #05", emoji: "🧑🏿", unlockAt: 1500,  accent: "#4bd2c9", particles: ["#4bd2c9", "#2ea89f", "#8cf0e6", "#1c7e77"] },
+    { id: 5, name: "Skin #06", emoji: "👶🏽", unlockAt: 3000,  accent: "#ff8fc7", particles: ["#ff8fc7", "#e0609f", "#ffc2e0", "#b83d7c"] },
+    { id: 6, name: "Skin #07", emoji: "🧓🏻", unlockAt: 5500,  accent: "#cfd8dc", particles: ["#cfd8dc", "#90a4ae", "#eceff1", "#607d8b"] },
+    { id: 7, name: "Skin #08", emoji: "🧔🏾", unlockAt: 9000,  accent: "#d99a3d", particles: ["#d99a3d", "#b87c22", "#f0c57a", "#8f5f14"] },
+    { id: 8, name: "Skin #09", emoji: "🧑🏿‍🦱", unlockAt: 15000, accent: "#ff4d6d", particles: ["#ff4d6d", "#d92e4d", "#ff8fa3", "#a3132c"] }
   ];
 
-  // ---------- persistence ----------
   var STORAGE_CLICKS = 'skindex_clicks';
   var STORAGE_CURRENT = 'skindex_current';
 
-  function loadClicks() {
+  function loadInt(key) {
     try {
-      var v = parseInt(localStorage.getItem(STORAGE_CLICKS), 10);
+      var v = parseInt(localStorage.getItem(key), 10);
       return isNaN(v) ? 0 : v;
     } catch (e) { return 0; }
   }
-  function saveClicks(v) {
-    try { localStorage.setItem(STORAGE_CLICKS, String(v)); } catch (e) {}
-  }
-  function loadCurrent() {
-    try {
-      var v = parseInt(localStorage.getItem(STORAGE_CURRENT), 10);
-      return isNaN(v) ? 0 : v;
-    } catch (e) { return 0; }
-  }
-  function saveCurrent(v) {
-    try { localStorage.setItem(STORAGE_CURRENT, String(v)); } catch (e) {}
+  function saveInt(key, v) {
+    try { localStorage.setItem(key, String(v)); } catch (e) {}
   }
 
   function isUnlocked(skin, clicks) { return clicks >= skin.unlockAt; }
   function unlockedSkins(clicks) { return skins.filter(function (s) { return isUnlocked(s, clicks); }); }
 
-  var count = loadClicks();
-  var skinIdx = loadCurrent();
+  var count = loadInt(STORAGE_CLICKS);
+  var skinIdx = loadInt(STORAGE_CURRENT);
   if (!isUnlocked(skins[skinIdx], count)) skinIdx = 0;
 
   var root = document.documentElement;
-  var blob = document.getElementById('blob');
+  var avatar = document.getElementById('avatar-frame');
+  var skinNameEl = document.getElementById('skin-name');
+  var clickCountEl = document.getElementById('click-count');
   var skindexbtn = document.getElementById('skindexbtn');
-  var body = document.body;
-  var counterEl = document.getElementById('counter');
   var toastEl = document.getElementById('toast');
   var overlay = document.getElementById('skindex-overlay');
   var grid = document.getElementById('skindex-grid');
   var sub = document.getElementById('skindex-sub');
   var closeBtn = document.getElementById('skindex-close');
 
-  function applySkin(i, animate) {
+  function applySkin(i) {
     var s = skins[i];
     skinIdx = i;
-    saveCurrent(i);
-    root.style.setProperty('--bg1', s.bg1);
-    root.style.setProperty('--bg2', s.bg2);
+    saveInt(STORAGE_CURRENT, i);
     root.style.setProperty('--accent', s.accent);
-    blob.textContent = s.emoji;
-    skindexbtn.title = 'open Skindex (current: ' + s.name + ')';
-    if (animate) {
-      var peel = document.createElement('div');
-      peel.className = 'peel show';
-      peel.style.background = 'linear-gradient(90deg, ' + s.bg1 + ', ' + s.bg2 + ')';
-      body.appendChild(peel);
-      setTimeout(function () { peel.remove(); }, 750);
-    }
+    avatar.textContent = s.emoji;
+    skinNameEl.textContent = s.name;
   }
-  applySkin(skinIdx, false);
-  counterEl.textContent = count;
+  applySkin(skinIdx);
+  clickCountEl.textContent = count;
 
-  // ---------- toast ----------
   var toastTimeout;
   function showToast(text) {
     clearTimeout(toastTimeout);
@@ -329,7 +330,6 @@
     toastTimeout = setTimeout(function () { toastEl.classList.remove('show'); }, 2200);
   }
 
-  // ---------- skindex overlay ----------
   function renderSkindex() {
     var unlockedCount = unlockedSkins(count).length;
     sub.textContent = unlockedCount + ' / ' + skins.length + ' unlocked';
@@ -342,77 +342,47 @@
         tile.innerHTML = '<div class="skindex-emoji">' + s.emoji + '</div><div class="skindex-name">' + s.name + '</div>';
         tile.addEventListener('click', function (e) {
           e.stopPropagation();
-          applySkin(s.id, true);
+          applySkin(s.id);
           closeSkindex();
         });
       } else {
-        tile.innerHTML = '<div class="skindex-emoji">❔</div><div class="skindex-name">???</div><div class="skindex-lock">🔒 ' + s.unlockAt + ' clicks</div>';
+        tile.innerHTML = '<div class="skindex-emoji">❔</div><div class="skindex-name">???</div><div class="skindex-lock">🔒 ' + s.unlockAt + '</div>';
       }
       grid.appendChild(tile);
     });
   }
 
-  function openSkindex() {
-    renderSkindex();
-    overlay.classList.add('show');
-  }
-  function closeSkindex() {
-    overlay.classList.remove('show');
-  }
+  function openSkindex() { renderSkindex(); overlay.classList.add('show'); }
+  function closeSkindex() { overlay.classList.remove('show'); }
 
-  skindexbtn.addEventListener('click', function (e) {
-    e.stopPropagation();
-    openSkindex();
-  });
-  closeBtn.addEventListener('click', function (e) {
-    e.stopPropagation();
-    closeSkindex();
-  });
+  skindexbtn.addEventListener('click', function (e) { e.stopPropagation(); openSkindex(); });
+  closeBtn.addEventListener('click', function (e) { e.stopPropagation(); closeSkindex(); });
   overlay.addEventListener('click', function (e) {
-    if (e.target === overlay) {
-      e.stopPropagation();
-      closeSkindex();
-    }
+    if (e.target === overlay) { e.stopPropagation(); closeSkindex(); }
   });
 
-  // ---------- bounce ----------
-  var x = Math.random() * (window.innerWidth - 200);
-  var y = Math.random() * (window.innerHeight - 100);
-  var dx = 2.4, dy = 2.1;
-
-  function tick() {
-    var w = blob.offsetWidth, h = blob.offsetHeight;
-    x += dx; y += dy;
-    if (x <= 0 || x + w >= window.innerWidth) { dx *= -1; x = Math.max(0, Math.min(x, window.innerWidth - w)); }
-    if (y <= 0 || y + h >= window.innerHeight) { dy *= -1; y = Math.max(0, Math.min(y, window.innerHeight - h)); }
-    blob.style.transform = 'translate(' + x + 'px,' + y + 'px)';
-    requestAnimationFrame(tick);
-  }
-  requestAnimationFrame(tick);
-
-  // ---------- click fun ----------
   function burst(cx, cy) {
     var pal = skins[skinIdx].particles;
-    for (var i = 0; i < 14; i++) {
+    for (var i = 0; i < 12; i++) {
       var p = document.createElement('div');
       p.className = 'particle';
-      var size = 6 + Math.random() * 6;
+      var size = 5 + Math.random() * 5;
       p.style.width = size + 'px';
       p.style.height = size + 'px';
       p.style.background = pal[Math.floor(Math.random() * pal.length)];
       document.body.appendChild(p);
       var angle = Math.random() * Math.PI * 2;
-      var dist = 60 + Math.random() * 90;
+      var dist = 50 + Math.random() * 70;
       var tx = Math.cos(angle) * dist;
       var ty = Math.sin(angle) * dist;
       var start = performance.now();
-      var life = 500 + Math.random() * 300;
+      var life = 450 + Math.random() * 250;
       (function (p, tx, ty, start, life) {
         function frame(now) {
           var t = (now - start) / life;
           if (t >= 1) { p.remove(); return; }
           var ease = 1 - Math.pow(1 - t, 2);
-          p.style.transform = 'translate(' + (cx + tx * ease) + 'px,' + (cy + ty * ease - t * 40) + 'px)';
+          p.style.transform = 'translate(' + (cx + tx * ease) + 'px,' + (cy + ty * ease - t * 30) + 'px)';
           p.style.opacity = 1 - t;
           requestAnimationFrame(frame);
         }
@@ -422,27 +392,29 @@
   }
 
   var lastClickTime = 0;
-  document.addEventListener('click', function (e) {
+  function registerClick(e) {
     if (overlay.classList.contains('show')) return;
-    if (e.target === skindexbtn) return;
     var now = performance.now();
-    if (now - lastClickTime < 60) return; // debounce duplicate synthetic events
+    if (now - lastClickTime < 60) return;
     lastClickTime = now;
 
     count++;
-    saveClicks(count);
-    counterEl.textContent = count;
-    burst(e.clientX, e.clientY);
+    saveInt(STORAGE_CLICKS, count);
+    clickCountEl.textContent = count;
+    var rect = avatar.getBoundingClientRect();
+    burst(
+      e && e.clientX ? e.clientX : rect.left + rect.width / 2,
+      e && e.clientY ? e.clientY : rect.top + rect.height / 2
+    );
 
     var justUnlocked = skins.find(function (s) { return s.unlockAt === count; });
-    if (justUnlocked) {
-      showToast('🔓 new skin unlocked — ' + justUnlocked.name);
-    }
-  });
+    if (justUnlocked) showToast('🔓 new skin unlocked — ' + justUnlocked.name);
+  }
 
-  window.addEventListener('resize', function () {
-    x = Math.min(x, window.innerWidth - blob.offsetWidth);
-    y = Math.min(y, window.innerHeight - blob.offsetHeight);
+  avatar.addEventListener('click', function (e) { e.stopPropagation(); registerClick(e); });
+  document.addEventListener('click', function (e) {
+    if (e.target === avatar || e.target === skindexbtn) return;
+    registerClick(e);
   });
 })();
 </script>
