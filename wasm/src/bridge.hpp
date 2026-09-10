@@ -120,13 +120,13 @@ EM_JS(void, js_upgrades_add_row, (int id, const char* name, const char* desc, in
           "<div class=\"upg-name\">" + UTF8ToString(name) + " <span class=\"upg-level\">Lv " + level + "/" + maxLevel + "</span></div>" +
           "<div class=\"upg-desc\">" + UTF8ToString(desc) + "</div>" +
         "</div>" +
-        "<button class=\"upg-buy\"" + ((maxed || !canAfford) ? " disabled" : "") + ">" + btnLabel + "</button>";
-    if (!maxed) {
-        row.querySelector(".upg-buy").addEventListener("click", function (e) {
-            e.stopPropagation();
-            Module.ccall("app_buy_upgrade", null, ["number"], [id]);
-        });
-    }
+        "<button class=\"upg-buy" + ((maxed || !canAfford) ? " dim" : "") + "\">" + btnLabel + "</button>";
+    // Always clickable (even when maxed/unaffordable) so a click always
+    // gives feedback via a toast, instead of a silently inert button.
+    row.querySelector(".upg-buy").addEventListener("click", function (e) {
+        e.stopPropagation();
+        Module.ccall("app_buy_upgrade", null, ["number"], [id]);
+    });
     list.appendChild(row);
 });
 
@@ -143,7 +143,9 @@ EM_JS(void, js_skills_add_node, (int id, const char* name, const char* desc, int
         "<div class=\"skill-name\">" + UTF8ToString(name) + "</div>" +
         "<div class=\"skill-desc\">" + UTF8ToString(desc) + "</div>" +
         "<div class=\"skill-cost\">" + (owned ? "✓ owned" : ("✨ " + cost + " essence")) + "</div>";
-    if (!owned && available) {
+    // Clickable whenever not yet owned — even if it looks locked — so a
+    // click always explains why via a toast, instead of doing nothing.
+    if (!owned) {
         node.addEventListener("click", function (e) {
             e.stopPropagation();
             Module.ccall("app_buy_skill", null, ["number"], [id]);
@@ -155,13 +157,12 @@ EM_JS(void, js_skills_add_node, (int id, const char* name, const char* desc, int
 EM_JS(void, js_rebirth_set_preview, (int essenceGain, int canRebirth, int minPoints), {
     var btn = document.getElementById("rebirth-btn");
     var note = document.getElementById("rebirth-note");
+    btn.classList.toggle("dim", !canRebirth);
     if (canRebirth) {
         note.textContent = "Reset your points and upgrades for +" + essenceGain + " essence, permanently.";
-        btn.disabled = false;
         btn.textContent = "Rebirth for +" + essenceGain + " essence";
     } else {
         note.textContent = "Reach " + minPoints + " points to unlock rebirth.";
-        btn.disabled = true;
         btn.textContent = "Rebirth (locked)";
     }
 });

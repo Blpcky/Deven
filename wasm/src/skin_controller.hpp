@@ -20,7 +20,7 @@ public:
     static constexpr double kComboMax = 3.0; // before Combo Flex upgrade levels
     static constexpr double kCritChance = 0.08; // before Lucky Skin upgrade levels
     static constexpr int kCritMultiplier = 5;   // before Crit Power upgrade levels
-    static constexpr double kFlybyChancePerSecond = 0.00002; // 0.002%
+    static constexpr double kFlybyChancePerSecond = 0.01; // 1% per second — averages about once every ~100s
 
     SkinController() : view_(model_) {
         model_.subscribe([this] { view_.render(); });
@@ -64,21 +64,50 @@ public:
     }
 
     void buyUpgrade(int id) {
+        const UpgradeDef& u = model_.upgradeDefs()[id];
+        if (model_.upgradeLevel(id) >= u.maxLevel) {
+            js_show_toast((u.name + " is already maxed out").c_str());
+            return;
+        }
+        long cost = model_.upgradeCost(id);
+        if (model_.clicks() < cost) {
+            std::string msg = "Not enough points — need " + std::to_string(cost) + " for " + u.name;
+            js_show_toast(msg.c_str());
+            return;
+        }
         model_.buyUpgrade(id);
+        std::string msg = u8"\U00002B06\U0000FE0F " + u.name + " -> Lv " + std::to_string(model_.upgradeLevel(id));
+        js_show_toast(msg.c_str());
     }
 
     void buySkill(int id) {
+        const SkillDef& s = model_.skillDefs()[id];
+        if (model_.hasSkill(id)) return;
+        bool prereqMet = s.prereq.empty();
+        for (int p : s.prereq) if (model_.hasSkill(p)) prereqMet = true;
+        if (!prereqMet) {
+            js_show_toast((u8"\U0001F512 " + s.name + " needs an earlier skill first").c_str());
+            return;
+        }
+        if (model_.essence() < s.cost) {
+            std::string msg = "Not enough essence — need " + std::to_string(s.cost) + " for " + s.name;
+            js_show_toast(msg.c_str());
+            return;
+        }
         model_.buySkill(id);
+        js_show_toast((u8"\U0001F331 skill unlocked — " + s.name).c_str());
     }
 
     void doRebirth() {
-        int gained = model_.projectedRebirthEssence();
-        bool could = model_.canRebirth();
-        model_.doRebirth();
-        if (could) {
-            std::string msg = std::string(u8"\U0001F30C rebirth! +") + std::to_string(gained) + " essence";
+        if (!model_.canRebirth()) {
+            std::string msg = "Reach " + std::to_string(kRebirthMinPoints) + " points to rebirth";
             js_show_toast(msg.c_str());
+            return;
         }
+        int gained = model_.projectedRebirthEssence();
+        model_.doRebirth();
+        std::string msg = std::string(u8"\U0001F30C rebirth! +") + std::to_string(gained) + " essence";
+        js_show_toast(msg.c_str());
     }
 
     void tick() {
