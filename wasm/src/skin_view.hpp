@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdio>
 #include "mvc.hpp"
 #include "skin_model.hpp"
 #include "bridge.hpp"
@@ -23,13 +24,23 @@ public:
         const Skin& s = model_.current();
         js_set_avatar_emoji(s.emoji.c_str());
         js_set_accent(s.accent.c_str());
-        js_set_skin_name(s.name.c_str());
+        js_set_skin_name(formatLabel(s).c_str());
         js_set_click_count(model_.clicks());
         js_set_idle_active(model_.unlockedCount() >= kIdleUnlockCount ? 1 : 0);
         if (skindexOpen_) renderSkindex();
     }
 
 private:
+    static std::string formatMultiplier(double m) {
+        char buf[16];
+        snprintf(buf, sizeof(buf), "%.1fx", m);
+        return std::string(buf);
+    }
+
+    static std::string formatLabel(const Skin& s) {
+        return s.name + " (" + formatMultiplier(s.multiplier) + ")";
+    }
+
     void renderSkindex() {
         std::string sub = std::to_string(model_.unlockedCount()) + " / " +
                            std::to_string(model_.roster().size()) + " unlocked";
@@ -38,7 +49,8 @@ private:
         for (const Skin& s : model_.roster()) {
             bool unlocked = model_.isUnlocked(s.id);
             bool active = unlocked && s.id == model_.current().id;
-            js_skindex_add_tile(s.id, s.name.c_str(), s.emoji.c_str(),
+            std::string label = unlocked ? formatMultiplier(s.multiplier) : "";
+            js_skindex_add_tile(s.id, s.name.c_str(), s.emoji.c_str(), label.c_str(),
                                  unlocked ? 1 : 0, s.unlockAt, active ? 1 : 0);
         }
     }

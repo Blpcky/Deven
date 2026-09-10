@@ -19,6 +19,7 @@ struct Skin {
     int unlockAt;
     std::string accent;
     std::array<std::string, 4> particles;
+    double multiplier;  // scales every point gain (clicks, crits, idle) while equipped
 };
 
 // Owns all Skindex state: the roster, lifetime click count, which skin
@@ -28,15 +29,15 @@ class SkinModel : public mvc::Model {
 public:
     SkinModel() {
         roster_ = {
-            {0, "Skin #01", u8"\U0001F9D1\U0001F3FB", 0,     "#ffb98a", {"#ffb98a", "#e69a63", "#ffd9b8", "#c97a3f"}},
-            {1, "Skin #02", u8"\U0001F9D1\U0001F3FC", 100,   "#f2c14e", {"#f2c14e", "#d9a52e", "#ffe08a", "#a67c1a"}},
-            {2, "Skin #03", u8"\U0001F9D1\U0001F3FD", 300,   "#ff6b6b", {"#ff6b6b", "#e04545", "#ff9e9e", "#b32c2c"}},
-            {3, "Skin #04", u8"\U0001F9D1\U0001F3FE", 750,   "#9d7fff", {"#9d7fff", "#7d5be0", "#c6b3ff", "#5a3dbf"}},
-            {4, "Skin #05", u8"\U0001F9D1\U0001F3FF", 1500,  "#4bd2c9", {"#4bd2c9", "#2ea89f", "#8cf0e6", "#1c7e77"}},
-            {5, "Skin #06", u8"\U0001F476\U0001F3FD", 3000,  "#ff8fc7", {"#ff8fc7", "#e0609f", "#ffc2e0", "#b83d7c"}},
-            {6, "Skin #07", u8"\U0001F9D3\U0001F3FB", 5500,  "#cfd8dc", {"#cfd8dc", "#90a4ae", "#eceff1", "#607d8b"}},
-            {7, "Skin #08", u8"\U0001F9D4\U0001F3FE", 9000,  "#d99a3d", {"#d99a3d", "#b87c22", "#f0c57a", "#8f5f14"}},
-            {8, "Skin #09", u8"\U0001F9D1\U0001F3FF\U0000200D\U0001F9B1", 15000, "#ff4d6d", {"#ff4d6d", "#d92e4d", "#ff8fa3", "#a3132c"}},
+            {0, "Skin #01", u8"\U0001F9D1\U0001F3FB", 0,     "#ffb98a", {"#ffb98a", "#e69a63", "#ffd9b8", "#c97a3f"}, 1.0},
+            {1, "Skin #02", u8"\U0001F9D1\U0001F3FC", 100,   "#f2c14e", {"#f2c14e", "#d9a52e", "#ffe08a", "#a67c1a"}, 1.2},
+            {2, "Skin #03", u8"\U0001F9D1\U0001F3FD", 300,   "#ff6b6b", {"#ff6b6b", "#e04545", "#ff9e9e", "#b32c2c"}, 1.5},
+            {3, "Skin #04", u8"\U0001F9D1\U0001F3FE", 750,   "#9d7fff", {"#9d7fff", "#7d5be0", "#c6b3ff", "#5a3dbf"}, 2.0},
+            {4, "Skin #05", u8"\U0001F9D1\U0001F3FF", 1500,  "#4bd2c9", {"#4bd2c9", "#2ea89f", "#8cf0e6", "#1c7e77"}, 2.5},
+            {5, "Skin #06", u8"\U0001F476\U0001F3FD", 3000,  "#ff8fc7", {"#ff8fc7", "#e0609f", "#ffc2e0", "#b83d7c"}, 3.5},
+            {6, "Skin #07", u8"\U0001F9D3\U0001F3FB", 5500,  "#cfd8dc", {"#cfd8dc", "#90a4ae", "#eceff1", "#607d8b"}, 5.0},
+            {7, "Skin #08", u8"\U0001F9D4\U0001F3FE", 9000,  "#d99a3d", {"#d99a3d", "#b87c22", "#f0c57a", "#8f5f14"}, 7.0},
+            {8, "Skin #09", u8"\U0001F9D1\U0001F3FF\U0000200D\U0001F9B1", 15000, "#ff4d6d", {"#ff4d6d", "#d92e4d", "#ff8fa3", "#a3132c"}, 10.0},
         };
 
         clicks_ = js_get_int("skindex_clicks", 0);

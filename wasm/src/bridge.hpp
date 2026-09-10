@@ -77,12 +77,12 @@ EM_JS(void, js_skindex_clear, (), {
     document.getElementById("skindex-grid").innerHTML = "";
 });
 
-EM_JS(void, js_skindex_add_tile, (int id, const char* name, const char* emoji, int unlocked, int unlockAt, int active), {
+EM_JS(void, js_skindex_add_tile, (int id, const char* name, const char* emoji, const char* multLabel, int unlocked, int unlockAt, int active), {
     var grid = document.getElementById("skindex-grid");
     var tile = document.createElement("div");
     tile.className = "skindex-tile" + (unlocked ? "" : " locked") + (active ? " active" : "");
     if (unlocked) {
-        tile.innerHTML = "<div class=\"skindex-emoji\">" + UTF8ToString(emoji) + "</div><div class=\"skindex-name\">" + UTF8ToString(name) + "</div>";
+        tile.innerHTML = "<div class=\"skindex-emoji\">" + UTF8ToString(emoji) + "</div><div class=\"skindex-name\">" + UTF8ToString(name) + "</div><div class=\"skindex-mult\">" + UTF8ToString(multLabel) + "</div>";
         tile.addEventListener("click", function (e) {
             e.stopPropagation();
             Module.ccall("app_skindex_tile_click", null, ["number"], [id]);

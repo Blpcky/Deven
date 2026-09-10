@@ -74,7 +74,8 @@ public:
             idleAccumMs_ += dt;
             while (idleAccumMs_ >= kIdleIntervalMs) {
                 idleAccumMs_ -= kIdleIntervalMs;
-                announceUnlocks(model_.registerPoints(kIdlePoints));
+                int points = std::max(1, (int) std::lround(kIdlePoints * model_.current().multiplier));
+                announceUnlocks(model_.registerPoints(points));
             }
         }
     }
@@ -101,7 +102,8 @@ private:
         view_.setCombo(combo_);
 
         bool crit = ((double) rand() / RAND_MAX) < kCritChance;
-        int points = std::max(1, (int) std::lround(combo_ * (crit ? kCritMultiplier : 1)));
+        double skinMult = model_.current().multiplier;
+        int points = std::max(1, (int) std::lround(combo_ * skinMult * (crit ? kCritMultiplier : 1)));
 
         auto justUnlocked = model_.registerPoints(points);
         particles_.burst(x, y, model_.current().particles, crit ? 22 : 12);
