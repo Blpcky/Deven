@@ -173,7 +173,7 @@ EM_JS(void, js_trigger_flyby, (), {
     wrap.style.top = (8 + Math.random() * 70) + "vh";
 
     var img = document.createElement("img");
-    img.src = "deven-flyby.jpg";
+    img.src = "deven-flyby.png";
     img.alt = "";
     img.onerror = function () {
         img.remove();
