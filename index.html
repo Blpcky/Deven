@@ -68,6 +68,13 @@
   .tagline {
     color: var(--sage);
     font-size: 15px;
+    margin: 0 0 8px;
+  }
+  .wasm-note {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11px;
+    color: var(--sage);
+    opacity: 0.5;
     margin: 0 0 40px;
   }
 
@@ -244,6 +251,7 @@
     <div class="eyebrow">devenballback.skin</div>
     <h1>Deven Ballback</h1>
     <p class="tagline">Collector of skins. Ballback by trade.</p>
+    <p class="wasm-note">Skindex engine: C++ → WebAssembly</p>
 
     <div id="avatar-frame" title="click to earn progress"></div>
     <div id="avatar-stat"><b id="skin-name"></b> · <span id="click-count">0</span> clicks</div>
@@ -266,155 +274,59 @@
     </div>
   </div>
 
+<!--
+  All application state (click count, unlocked skins, particle physics)
+  lives in C++, compiled to WebAssembly (see wasm/src/). This script is
+  just a thin shell: it forwards DOM events into the wasm module and
+  lets the module's own bridge functions (wasm/src/bridge.hpp) write
+  back to the DOM. See wasm/build.sh to rebuild skinapp.wasm.
+-->
+<script src="skinapp.js"></script>
 <script>
 (function () {
-  var skins = [
-    { id: 0, name: "Skin #01", emoji: "🧑🏻", unlockAt: 0,     accent: "#ffb98a", particles: ["#ffb98a", "#e69a63", "#ffd9b8", "#c97a3f"] },
-    { id: 1, name: "Skin #02", emoji: "🧑🏼", unlockAt: 100,   accent: "#f2c14e", particles: ["#f2c14e", "#d9a52e", "#ffe08a", "#a67c1a"] },
-    { id: 2, name: "Skin #03", emoji: "🧑🏽", unlockAt: 300,   accent: "#ff6b6b", particles: ["#ff6b6b", "#e04545", "#ff9e9e", "#b32c2c"] },
-    { id: 3, name: "Skin #04", emoji: "🧑🏾", unlockAt: 750,   accent: "#9d7fff", particles: ["#9d7fff", "#7d5be0", "#c6b3ff", "#5a3dbf"] },
-    { id: 4, name: "Skin #05", emoji: "🧑🏿", unlockAt: 1500,  accent: "#4bd2c9", particles: ["#4bd2c9", "#2ea89f", "#8cf0e6", "#1c7e77"] },
-    { id: 5, name: "Skin #06", emoji: "👶🏽", unlockAt: 3000,  accent: "#ff8fc7", particles: ["#ff8fc7", "#e0609f", "#ffc2e0", "#b83d7c"] },
-    { id: 6, name: "Skin #07", emoji: "🧓🏻", unlockAt: 5500,  accent: "#cfd8dc", particles: ["#cfd8dc", "#90a4ae", "#eceff1", "#607d8b"] },
-    { id: 7, name: "Skin #08", emoji: "🧔🏾", unlockAt: 9000,  accent: "#d99a3d", particles: ["#d99a3d", "#b87c22", "#f0c57a", "#8f5f14"] },
-    { id: 8, name: "Skin #09", emoji: "🧑🏿‍🦱", unlockAt: 15000, accent: "#ff4d6d", particles: ["#ff4d6d", "#d92e4d", "#ff8fa3", "#a3132c"] }
-  ];
-
-  var STORAGE_CLICKS = 'skindex_clicks';
-  var STORAGE_CURRENT = 'skindex_current';
-
-  function loadInt(key) {
-    try {
-      var v = parseInt(localStorage.getItem(key), 10);
-      return isNaN(v) ? 0 : v;
-    } catch (e) { return 0; }
-  }
-  function saveInt(key, v) {
-    try { localStorage.setItem(key, String(v)); } catch (e) {}
-  }
-
-  function isUnlocked(skin, clicks) { return clicks >= skin.unlockAt; }
-  function unlockedSkins(clicks) { return skins.filter(function (s) { return isUnlocked(s, clicks); }); }
-
-  var count = loadInt(STORAGE_CLICKS);
-  var skinIdx = loadInt(STORAGE_CURRENT);
-  if (!isUnlocked(skins[skinIdx], count)) skinIdx = 0;
-
-  var root = document.documentElement;
   var avatar = document.getElementById('avatar-frame');
-  var skinNameEl = document.getElementById('skin-name');
-  var clickCountEl = document.getElementById('click-count');
   var skindexbtn = document.getElementById('skindexbtn');
-  var toastEl = document.getElementById('toast');
   var overlay = document.getElementById('skindex-overlay');
-  var grid = document.getElementById('skindex-grid');
-  var sub = document.getElementById('skindex-sub');
   var closeBtn = document.getElementById('skindex-close');
 
-  function applySkin(i) {
-    var s = skins[i];
-    skinIdx = i;
-    saveInt(STORAGE_CURRENT, i);
-    root.style.setProperty('--accent', s.accent);
-    avatar.textContent = s.emoji;
-    skinNameEl.textContent = s.name;
-  }
-  applySkin(skinIdx);
-  clickCountEl.textContent = count;
-
-  var toastTimeout;
-  function showToast(text) {
-    clearTimeout(toastTimeout);
-    toastEl.textContent = text;
-    toastEl.classList.add('show');
-    toastTimeout = setTimeout(function () { toastEl.classList.remove('show'); }, 2200);
+  function ready(fn) {
+    if (typeof Module !== 'undefined' && Module.calledRun) fn();
+    else Module.onRuntimeInitialized = fn;
   }
 
-  function renderSkindex() {
-    var unlockedCount = unlockedSkins(count).length;
-    sub.textContent = unlockedCount + ' / ' + skins.length + ' unlocked';
-    grid.innerHTML = '';
-    skins.forEach(function (s) {
-      var unlocked = isUnlocked(s, count);
-      var tile = document.createElement('div');
-      tile.className = 'skindex-tile' + (unlocked ? '' : ' locked') + (unlocked && s.id === skinIdx ? ' active' : '');
-      if (unlocked) {
-        tile.innerHTML = '<div class="skindex-emoji">' + s.emoji + '</div><div class="skindex-name">' + s.name + '</div>';
-        tile.addEventListener('click', function (e) {
-          e.stopPropagation();
-          applySkin(s.id);
-          closeSkindex();
-        });
-      } else {
-        tile.innerHTML = '<div class="skindex-emoji">❔</div><div class="skindex-name">???</div><div class="skindex-lock">🔒 ' + s.unlockAt + '</div>';
-      }
-      grid.appendChild(tile);
+  ready(function () {
+    Module.ccall('app_init', null, [], []);
+
+    document.addEventListener('click', function (e) {
+      if (overlay.classList.contains('show')) return;
+      if (e.target === avatar || e.target === skindexbtn) return;
+      Module.ccall('app_background_click', null, ['number', 'number'], [e.clientX, e.clientY]);
     });
-  }
 
-  function openSkindex() { renderSkindex(); overlay.classList.add('show'); }
-  function closeSkindex() { overlay.classList.remove('show'); }
+    avatar.addEventListener('click', function (e) {
+      e.stopPropagation();
+      Module.ccall('app_avatar_click', null, ['number', 'number'], [e.clientX, e.clientY]);
+    });
 
-  skindexbtn.addEventListener('click', function (e) { e.stopPropagation(); openSkindex(); });
-  closeBtn.addEventListener('click', function (e) { e.stopPropagation(); closeSkindex(); });
-  overlay.addEventListener('click', function (e) {
-    if (e.target === overlay) { e.stopPropagation(); closeSkindex(); }
-  });
+    skindexbtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      Module.ccall('app_skindex_open', null, [], []);
+    });
 
-  function burst(cx, cy) {
-    var pal = skins[skinIdx].particles;
-    for (var i = 0; i < 12; i++) {
-      var p = document.createElement('div');
-      p.className = 'particle';
-      var size = 5 + Math.random() * 5;
-      p.style.width = size + 'px';
-      p.style.height = size + 'px';
-      p.style.background = pal[Math.floor(Math.random() * pal.length)];
-      document.body.appendChild(p);
-      var angle = Math.random() * Math.PI * 2;
-      var dist = 50 + Math.random() * 70;
-      var tx = Math.cos(angle) * dist;
-      var ty = Math.sin(angle) * dist;
-      var start = performance.now();
-      var life = 450 + Math.random() * 250;
-      (function (p, tx, ty, start, life) {
-        function frame(now) {
-          var t = (now - start) / life;
-          if (t >= 1) { p.remove(); return; }
-          var ease = 1 - Math.pow(1 - t, 2);
-          p.style.transform = 'translate(' + (cx + tx * ease) + 'px,' + (cy + ty * ease - t * 30) + 'px)';
-          p.style.opacity = 1 - t;
-          requestAnimationFrame(frame);
-        }
-        requestAnimationFrame(frame);
-      })(p, tx, ty, start, life);
-    }
-  }
+    closeBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      Module.ccall('app_skindex_close', null, [], []);
+    });
 
-  var lastClickTime = 0;
-  function registerClick(e) {
-    if (overlay.classList.contains('show')) return;
-    var now = performance.now();
-    if (now - lastClickTime < 60) return;
-    lastClickTime = now;
-
-    count++;
-    saveInt(STORAGE_CLICKS, count);
-    clickCountEl.textContent = count;
-    var rect = avatar.getBoundingClientRect();
-    burst(
-      e && e.clientX ? e.clientX : rect.left + rect.width / 2,
-      e && e.clientY ? e.clientY : rect.top + rect.height / 2
-    );
-
-    var justUnlocked = skins.find(function (s) { return s.unlockAt === count; });
-    if (justUnlocked) showToast('🔓 new skin unlocked — ' + justUnlocked.name);
-  }
-
-  avatar.addEventListener('click', function (e) { e.stopPropagation(); registerClick(e); });
-  document.addEventListener('click', function (e) {
-    if (e.target === avatar || e.target === skindexbtn) return;
-    registerClick(e);
+    overlay.addEventListener('click', function (e) {
+      if (e.target === overlay) {
+        e.stopPropagation();
+        Module.ccall('app_skindex_close', null, [], []);
+      }
+    });
+    // Tile clicks inside the Skindex grid are wired up directly in
+    // bridge.hpp's js_skindex_add_tile, since the tiles are created
+    // from C++ and don't exist yet at page-load time.
   });
 })();
 </script>
