@@ -218,6 +218,27 @@
     z-index: 5;
   }
 
+  /* ---------- flyby easter egg (~0.002% chance, once per second) ---------- */
+  .flyby {
+    position: fixed;
+    left: -160px;
+    width: 110px;
+    z-index: 50;
+    pointer-events: none;
+    animation: flyacross 4s linear forwards;
+  }
+  .flyby img {
+    width: 100%;
+    display: block;
+    border-radius: 14px;
+    box-shadow: 0 8px 24px -6px rgba(0,0,0,0.5);
+  }
+  .flyby-fallback { font-size: 60px; line-height: 1; }
+  @keyframes flyacross {
+    from { transform: translateX(0); }
+    to   { transform: translateX(calc(100vw + 320px)); }
+  }
+
   /* ---------- skindex overlay ---------- */
   #skindex-overlay {
     position: fixed;

@@ -166,6 +166,28 @@ EM_JS(void, js_rebirth_set_preview, (int essenceGain, int canRebirth, int minPoi
     }
 });
 
+// ---------- flyby easter egg ----------
+EM_JS(void, js_trigger_flyby, (), {
+    var wrap = document.createElement("div");
+    wrap.className = "flyby";
+    wrap.style.top = (8 + Math.random() * 70) + "vh";
+
+    var img = document.createElement("img");
+    img.src = "deven-flyby.jpg";
+    img.alt = "";
+    img.onerror = function () {
+        img.remove();
+        var fallback = document.createElement("div");
+        fallback.className = "flyby-fallback";
+        fallback.textContent = "🧑";
+        wrap.appendChild(fallback);
+    };
+    wrap.appendChild(img);
+
+    document.body.appendChild(wrap);
+    wrap.addEventListener("animationend", function () { wrap.remove(); });
+});
+
 // ---------- particles ----------
 EM_JS(void, js_particle_create, (int id, const char* colorHex, double size), {
     var p = document.createElement("div");

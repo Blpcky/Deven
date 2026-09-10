@@ -20,6 +20,7 @@ public:
     static constexpr double kComboMax = 3.0; // before Combo Flex upgrade levels
     static constexpr double kCritChance = 0.08; // before Lucky Skin upgrade levels
     static constexpr int kCritMultiplier = 5;   // before Crit Power upgrade levels
+    static constexpr double kFlybyChancePerSecond = 0.00002; // 0.002%
 
     SkinController() : view_(model_) {
         model_.subscribe([this] { view_.render(); });
@@ -108,6 +109,16 @@ public:
                 announceUnlocks(model_.registerPoints(points));
             }
         }
+
+        // Easter egg: once per real second, a tiny (0.002%) chance for
+        // Deven himself to fly across the screen.
+        flybyAccumMs_ += dt;
+        while (flybyAccumMs_ >= 1000.0) {
+            flybyAccumMs_ -= 1000.0;
+            if (((double) rand() / RAND_MAX) < kFlybyChancePerSecond) {
+                js_trigger_flyby();
+            }
+        }
     }
 
 private:
@@ -171,4 +182,5 @@ private:
     double combo_ = 1.0;
     double lastTick_ = 0.0;
     double idleAccumMs_ = 0.0;
+    double flybyAccumMs_ = 0.0;
 };
