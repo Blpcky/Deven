@@ -3,121 +3,161 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Deven</title>
+<title>Deven Ballback's Skin Game</title>
 <style>
-  :root { color-scheme: dark; }
+  :root {
+    --bg1: #3a2418;
+    --bg2: #0c0705;
+    --accent: #e8b48a;
+    color-scheme: dark;
+  }
   html, body {
     margin: 0;
     height: 100%;
     overflow: hidden;
-    background: #0a0a12;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     cursor: default;
   }
   body {
     position: relative;
-    background: radial-gradient(circle at 50% 50%, #1a1030, #05050a 70%);
-    animation: bgshift 12s ease-in-out infinite alternate;
-  }
-  @keyframes bgshift {
-    0%   { filter: hue-rotate(0deg); }
-    100% { filter: hue-rotate(60deg); }
+    background: radial-gradient(circle at 50% 50%, var(--bg1), var(--bg2) 70%);
+    transition: background 0.6s ease;
   }
 
-  #logo {
+  #blob {
     position: absolute;
     top: 0; left: 0;
-    font-size: clamp(28px, 6vw, 64px);
-    font-weight: 800;
-    letter-spacing: -1px;
+    font-size: clamp(40px, 9vw, 96px);
+    line-height: 1;
     white-space: nowrap;
     user-select: none;
     will-change: transform;
-    text-shadow: 0 0 20px currentColor;
-    transition: color 0.15s linear;
-  }
-
-  #hint {
-    position: absolute;
-    bottom: 18px;
-    left: 50%;
-    transform: translateX(-50%);
-    color: #666;
-    font-size: 13px;
-    letter-spacing: 0.5px;
-    text-align: center;
-    user-select: none;
+    filter: drop-shadow(0 0 18px var(--accent));
+    transition: filter 0.4s ease;
   }
 
   #counter {
     position: absolute;
     top: 18px;
     right: 22px;
-    color: #888;
-    font-size: 13px;
+    color: var(--accent);
+    font-size: 14px;
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     user-select: none;
+    transition: color 0.6s ease;
   }
 
-  #message {
-    position: fixed;
-    top: 40%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0.8);
-    font-size: clamp(20px, 4vw, 36px);
-    font-weight: 700;
-    color: #fff;
-    text-shadow: 0 0 24px rgba(255,255,255,0.4);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.25s ease, transform 0.25s ease;
-    text-align: center;
-    padding: 0 20px;
+  #skinbtn {
+    position: absolute;
+    top: 14px;
+    left: 18px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.18);
+    color: var(--accent);
+    font-size: 16px;
+    line-height: 1;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    cursor: pointer;
+    backdrop-filter: blur(6px);
+    transition: background 0.2s ease, transform 0.15s ease, color 0.6s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
-  #message.show {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
+  #skinbtn:hover { background: rgba(255,255,255,0.16); transform: translateY(-1px); }
+  #skinbtn:active { transform: translateY(0) scale(0.92); }
 
   .particle {
     position: fixed;
-    width: 8px;
-    height: 8px;
     border-radius: 50%;
     pointer-events: none;
     top: 0; left: 0;
     will-change: transform, opacity;
   }
+
+  .peel {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 4;
+    opacity: 0;
+  }
+  .peel.show {
+    animation: peelOff 0.7s ease forwards;
+  }
+  @keyframes peelOff {
+    0%   { opacity: 0.9; clip-path: inset(0 0 0 0); }
+    100% { opacity: 0; clip-path: inset(0 100% 0 0); }
+  }
 </style>
 </head>
 <body>
-  <div id="counter">clicks: 0</div>
-  <div id="logo">DEVEN</div>
-  <div id="message"></div>
-  <div id="hint">click around. it's fine, nothing bad will happen. probably.</div>
+  <button id="skinbtn" title="change skin">🧬</button>
+  <div id="counter">0</div>
+  <div id="blob"></div>
 
 <script>
 (function () {
-  // ---------- DVD-bounce logo ----------
-  var logo = document.getElementById('logo');
+  var skins = [
+    { name: "human skin",     bg1: "#3a2418", bg2: "#0c0705", accent: "#e8b48a", particles: ["#e8b48a", "#d99a6c", "#c47a4e", "#fddbb0"], emoji: "🧑" },
+    { name: "snake skin",     bg1: "#0f2e1a", bg2: "#020805", accent: "#3ddc73", particles: ["#3ddc73", "#1f9d55", "#a8e063", "#0b5d2e"], emoji: "🐍" },
+    { name: "banana peel",    bg1: "#4a3a05", bg2: "#0a0700", accent: "#ffe066", particles: ["#ffe066", "#ffd23f", "#fff3b0", "#c9a600"], emoji: "🍌" },
+    { name: "orange peel",    bg1: "#4a2405", bg2: "#0a0400", accent: "#ff9f45", particles: ["#ff9f45", "#ff8113", "#ffcf9c", "#c9660a"], emoji: "🍊" },
+    { name: "grape skin",     bg1: "#2a0f3a", bg2: "#08020a", accent: "#c77dff", particles: ["#c77dff", "#9d4edd", "#e0aaff", "#5a189a"], emoji: "🍇" },
+    { name: "potato skin",    bg1: "#3a2f1a", bg2: "#0a0805", accent: "#c9a36a", particles: ["#c9a36a", "#a67c3d", "#e8d3a8", "#7c5a24"], emoji: "🥔" },
+    { name: "onion skin",     bg1: "#3a1a2a", bg2: "#0a0308", accent: "#e6a8cf", particles: ["#e6a8cf", "#c96ba0", "#f5d6e8", "#8f3d6b"], emoji: "🧅" },
+    { name: "drum skin",      bg1: "#2a1c0f", bg2: "#080502", accent: "#e0c9a0", particles: ["#e0c9a0", "#b89563", "#f5ead2", "#7c5a30"], emoji: "🥁" },
+    { name: "gator skin",     bg1: "#0f2a1c", bg2: "#020805", accent: "#7ba05b", particles: ["#7ba05b", "#4f6b39", "#a8c98a", "#2e3d20"], emoji: "🐊" },
+    { name: "dragon scales",  bg1: "#3a0c0c", bg2: "#0a0202", accent: "#ff8c42", particles: ["#ff4d4d", "#ff8c42", "#ffcf5c", "#c0392b"], emoji: "🐉" },
+    { name: "robot chassis",  bg1: "#1a1030", bg2: "#05050a", accent: "#4dd0e1", particles: ["#ff5f6d", "#ffc371", "#4dd0e1", "#a78bfa"], emoji: "🤖" },
+    { name: "shed skin",      bg1: "#1c1c1c", bg2: "#050505", accent: "#cfd8dc", particles: ["#cfd8dc", "#90a4ae", "#eceff1", "#607d8b"], emoji: "🫙" }
+  ];
+  var skinIdx = 0;
+  var root = document.documentElement;
+  var blob = document.getElementById('blob');
+  var skinbtn = document.getElementById('skinbtn');
+  var body = document.body;
+
+  function applySkin(i, animate) {
+    var s = skins[i];
+    root.style.setProperty('--bg1', s.bg1);
+    root.style.setProperty('--bg2', s.bg2);
+    root.style.setProperty('--accent', s.accent);
+    blob.textContent = s.emoji;
+    skinbtn.title = 'change skin (currently: ' + s.name + ')';
+    if (animate) {
+      var peel = document.createElement('div');
+      peel.className = 'peel show';
+      peel.style.background = 'linear-gradient(90deg, ' + s.bg1 + ', ' + s.bg2 + ')';
+      body.appendChild(peel);
+      setTimeout(function () { peel.remove(); }, 750);
+    }
+  }
+  applySkin(0, false);
+
+  var lastSkinClick = 0;
+  skinbtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    var now = performance.now();
+    if (now - lastSkinClick < 60) return;
+    lastSkinClick = now;
+    skinIdx = (skinIdx + 1) % skins.length;
+    applySkin(skinIdx, true);
+  });
+
+  // ---------- bounce ----------
   var x = Math.random() * (window.innerWidth - 200);
   var y = Math.random() * (window.innerHeight - 100);
   var dx = 2.4, dy = 2.1;
-  var colors = ['#ff5f6d', '#ffc371', '#4dd0e1', '#a78bfa', '#34d399', '#f472b6', '#60a5fa'];
-  var colorIdx = 0;
-  logo.style.color = colors[0];
-
-  function bounceColor() {
-    colorIdx = (colorIdx + 1) % colors.length;
-    logo.style.color = colors[colorIdx];
-  }
 
   function tick() {
-    var w = logo.offsetWidth, h = logo.offsetHeight;
+    var w = blob.offsetWidth, h = blob.offsetHeight;
     x += dx; y += dy;
-    if (x <= 0 || x + w >= window.innerWidth) { dx *= -1; x = Math.max(0, Math.min(x, window.innerWidth - w)); bounceColor(); }
-    if (y <= 0 || y + h >= window.innerHeight) { dy *= -1; y = Math.max(0, Math.min(y, window.innerHeight - h)); bounceColor(); }
-    logo.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+    if (x <= 0 || x + w >= window.innerWidth) { dx *= -1; x = Math.max(0, Math.min(x, window.innerWidth - w)); }
+    if (y <= 0 || y + h >= window.innerHeight) { dy *= -1; y = Math.max(0, Math.min(y, window.innerHeight - h)); }
+    blob.style.transform = 'translate(' + x + 'px,' + y + 'px)';
     requestAnimationFrame(tick);
   }
   requestAnimationFrame(tick);
@@ -125,41 +165,16 @@
   // ---------- click fun ----------
   var count = 0;
   var counterEl = document.getElementById('counter');
-  var messageEl = document.getElementById('message');
-  var messages = [
-    "nice click.",
-    "again? bold.",
-    "ok we're doing this.",
-    "you have a lot of free time.",
-    "still here?",
-    "certified clicker ✨",
-    "i respect the dedication.",
-    "there's nothing else here, you know.",
-    "achievement unlocked: clicking",
-    "ok this is just a website.",
-    "10/10 click form.",
-    "the button does not do anything btw.",
-    "yes. very impressive.",
-    "you win. congrats.",
-    "seek help.",
-  ];
 
-  var msgTimeout;
-  function showMessage(text) {
-    clearTimeout(msgTimeout);
-    messageEl.textContent = text;
-    messageEl.classList.add('show');
-    msgTimeout = setTimeout(function () {
-      messageEl.classList.remove('show');
-    }, 900);
-  }
-
-  var particleColors = colors;
   function burst(cx, cy) {
+    var pal = skins[skinIdx].particles;
     for (var i = 0; i < 14; i++) {
       var p = document.createElement('div');
       p.className = 'particle';
-      p.style.background = particleColors[Math.floor(Math.random() * particleColors.length)];
+      var size = 6 + Math.random() * 6;
+      p.style.width = size + 'px';
+      p.style.height = size + 'px';
+      p.style.background = pal[Math.floor(Math.random() * pal.length)];
       document.body.appendChild(p);
       var angle = Math.random() * Math.PI * 2;
       var dist = 60 + Math.random() * 90;
@@ -181,20 +196,20 @@
     }
   }
 
+  var lastClickTime = 0;
   document.addEventListener('click', function (e) {
+    if (e.target === skinbtn) return;
+    var now = performance.now();
+    if (now - lastClickTime < 60) return; // debounce duplicate synthetic events
+    lastClickTime = now;
     count++;
-    counterEl.textContent = 'clicks: ' + count;
+    counterEl.textContent = count;
     burst(e.clientX, e.clientY);
-    var idx = Math.min(count - 1, messages.length - 1);
-    showMessage(messages[idx] || messages[messages.length - 1]);
-    if (count === messages.length) {
-      document.getElementById('hint').textContent = "ok you've seen all the messages. go outside.";
-    }
   });
 
   window.addEventListener('resize', function () {
-    x = Math.min(x, window.innerWidth - logo.offsetWidth);
-    y = Math.min(y, window.innerHeight - logo.offsetHeight);
+    x = Math.min(x, window.innerWidth - blob.offsetWidth);
+    y = Math.min(y, window.innerHeight - blob.offsetHeight);
   });
 })();
 </script>
