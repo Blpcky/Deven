@@ -50,6 +50,31 @@ void app_skindex_tile_click(int id) {
     if (g_controller) g_controller->skindexTileClick(id);
 }
 
+EMSCRIPTEN_KEEPALIVE
+void app_progression_open() {
+    if (g_controller) g_controller->progressionOpen();
+}
+
+EMSCRIPTEN_KEEPALIVE
+void app_progression_close() {
+    if (g_controller) g_controller->progressionClose();
+}
+
+EMSCRIPTEN_KEEPALIVE
+void app_buy_upgrade(int id) {
+    if (g_controller) g_controller->buyUpgrade(id);
+}
+
+EMSCRIPTEN_KEEPALIVE
+void app_buy_skill(int id) {
+    if (g_controller) g_controller->buySkill(id);
+}
+
+EMSCRIPTEN_KEEPALIVE
+void app_do_rebirth() {
+    if (g_controller) g_controller->doRebirth();
+}
+
 } // extern "C"
 
 int main() {

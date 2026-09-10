@@ -20,14 +20,22 @@ public:
         if (open) renderSkindex();
     }
 
+    void setProgressionOpen(bool open) {
+        progressionOpen_ = open;
+        js_progression_set_open(open ? 1 : 0);
+        if (open) renderProgression();
+    }
+
     void render() override {
         const Skin& s = model_.current();
         js_set_avatar_emoji(s.emoji.c_str());
         js_set_accent(s.accent.c_str());
         js_set_skin_name(formatLabel(s).c_str());
-        js_set_click_count(model_.clicks());
-        js_set_idle_active(model_.unlockedCount() >= kIdleUnlockCount ? 1 : 0);
+        js_set_click_count((int) model_.clicks());
+        js_set_idle_active(model_.unlockedCount() >= model_.idleUnlockCount() ? 1 : 0);
+        js_set_prestige(model_.essence(), model_.rebirths(), (model_.essence() > 0 || model_.rebirths() > 0) ? 1 : 0);
         if (skindexOpen_) renderSkindex();
+        if (progressionOpen_) renderProgression();
     }
 
 private:
@@ -55,6 +63,29 @@ private:
         }
     }
 
+    void renderProgression() {
+        js_upgrades_clear();
+        for (const UpgradeDef& u : model_.upgradeDefs()) {
+            int level = model_.upgradeLevel(u.id);
+            bool maxed = level >= u.maxLevel;
+            long cost = model_.upgradeCost(u.id);
+            bool canAfford = model_.clicks() >= cost;
+            js_upgrades_add_row(u.id, u.name.c_str(), u.desc.c_str(), level, u.maxLevel,
+                                 (int) cost, canAfford ? 1 : 0, maxed ? 1 : 0);
+        }
+
+        js_skills_clear();
+        for (const SkillDef& s : model_.skillDefs()) {
+            bool owned = model_.hasSkill(s.id);
+            bool available = model_.skillAvailable(s.id);
+            js_skills_add_node(s.id, s.name.c_str(), s.desc.c_str(), s.cost, s.tier,
+                                owned ? 1 : 0, available ? 1 : 0);
+        }
+
+        js_rebirth_set_preview(model_.projectedRebirthEssence(), model_.canRebirth() ? 1 : 0, kRebirthMinPoints);
+    }
+
     const SkinModel& model_;
     bool skindexOpen_ = false;
+    bool progressionOpen_ = false;
 };

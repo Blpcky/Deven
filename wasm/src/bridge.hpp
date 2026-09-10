@@ -93,6 +93,79 @@ EM_JS(void, js_skindex_add_tile, (int id, const char* name, const char* emoji, c
     grid.appendChild(tile);
 });
 
+// ---------- prestige stat line (essence / rebirths) ----------
+EM_JS(void, js_set_prestige, (int essence, int rebirths, int visible), {
+    var el = document.getElementById("prestige-stat");
+    if (!el) return;
+    el.textContent = "✨ " + essence + " essence · " + rebirths + (rebirths === 1 ? " rebirth" : " rebirths");
+    el.classList.toggle("show", !!visible);
+});
+
+// ---------- progression overlay (upgrades / skill tree / rebirth) ----------
+EM_JS(void, js_progression_set_open, (int open), {
+    document.getElementById("progression-overlay").classList.toggle("show", !!open);
+});
+
+EM_JS(void, js_upgrades_clear, (), {
+    document.getElementById("upgrades-list").innerHTML = "";
+});
+
+EM_JS(void, js_upgrades_add_row, (int id, const char* name, const char* desc, int level, int maxLevel, int cost, int canAfford, int maxed), {
+    var list = document.getElementById("upgrades-list");
+    var row = document.createElement("div");
+    row.className = "upg-row";
+    var btnLabel = maxed ? "MAX" : ("+" + cost + " pts");
+    row.innerHTML =
+        "<div class=\"upg-info\">" +
+          "<div class=\"upg-name\">" + UTF8ToString(name) + " <span class=\"upg-level\">Lv " + level + "/" + maxLevel + "</span></div>" +
+          "<div class=\"upg-desc\">" + UTF8ToString(desc) + "</div>" +
+        "</div>" +
+        "<button class=\"upg-buy\"" + ((maxed || !canAfford) ? " disabled" : "") + ">" + btnLabel + "</button>";
+    if (!maxed) {
+        row.querySelector(".upg-buy").addEventListener("click", function (e) {
+            e.stopPropagation();
+            Module.ccall("app_buy_upgrade", null, ["number"], [id]);
+        });
+    }
+    list.appendChild(row);
+});
+
+EM_JS(void, js_skills_clear, (), {
+    document.getElementById("skills-list").innerHTML = "";
+});
+
+EM_JS(void, js_skills_add_node, (int id, const char* name, const char* desc, int cost, int tier, int owned, int available), {
+    var list = document.getElementById("skills-list");
+    var node = document.createElement("div");
+    node.className = "skill-node" + (owned ? " owned" : "") + (!owned && !available ? " locked" : "");
+    node.innerHTML =
+        "<div class=\"skill-tier\">tier " + tier + "</div>" +
+        "<div class=\"skill-name\">" + UTF8ToString(name) + "</div>" +
+        "<div class=\"skill-desc\">" + UTF8ToString(desc) + "</div>" +
+        "<div class=\"skill-cost\">" + (owned ? "✓ owned" : ("✨ " + cost + " essence")) + "</div>";
+    if (!owned && available) {
+        node.addEventListener("click", function (e) {
+            e.stopPropagation();
+            Module.ccall("app_buy_skill", null, ["number"], [id]);
+        });
+    }
+    list.appendChild(node);
+});
+
+EM_JS(void, js_rebirth_set_preview, (int essenceGain, int canRebirth, int minPoints), {
+    var btn = document.getElementById("rebirth-btn");
+    var note = document.getElementById("rebirth-note");
+    if (canRebirth) {
+        note.textContent = "Reset your points and upgrades for +" + essenceGain + " essence, permanently.";
+        btn.disabled = false;
+        btn.textContent = "Rebirth for +" + essenceGain + " essence";
+    } else {
+        note.textContent = "Reach " + minPoints + " points to unlock rebirth.";
+        btn.disabled = true;
+        btn.textContent = "Rebirth (locked)";
+    }
+});
+
 // ---------- particles ----------
 EM_JS(void, js_particle_create, (int id, const char* colorHex, double size), {
     var p = document.createElement("div");

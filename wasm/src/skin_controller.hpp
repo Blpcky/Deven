@@ -10,18 +10,16 @@
 // Wires the SkinModel + SkinView together and handles every input event
 // forwarded from JS. Also owns the "clicker game" layer on top of the
 // base model: a rapid-click combo multiplier, random critical clicks,
-// and passive/idle income once you're deep enough into the Skindex —
+// passive/idle income, upgrades, a skill tree, and rebirth/prestige —
 // the usual incremental-game toolkit (Cookie Clicker etc.), scaled way
 // down.
 class SkinController : public mvc::Controller {
 public:
     static constexpr double kComboWindowMs = 900.0;
     static constexpr double kComboStep = 0.15;
-    static constexpr double kComboMax = 3.0;
-    static constexpr double kCritChance = 0.08;
-    static constexpr int kCritMultiplier = 5;
-    // kIdleUnlockCount / kIdleIntervalMs / kIdlePoints live in skin_model.hpp,
-    // shared with SkinView (which shows the passive-income indicator).
+    static constexpr double kComboMax = 3.0; // before Combo Flex upgrade levels
+    static constexpr double kCritChance = 0.08; // before Lucky Skin upgrade levels
+    static constexpr int kCritMultiplier = 5;   // before Crit Power upgrade levels
 
     SkinController() : view_(model_) {
         model_.subscribe([this] { view_.render(); });
@@ -29,7 +27,7 @@ public:
     }
 
     void backgroundClick(double x, double y) {
-        if (skindexOpen_) return;
+        if (skindexOpen_ || progressionOpen_) return;
         if (!debounceOk()) return;
         registerClickAt(x, y);
     }
@@ -54,6 +52,34 @@ public:
         skindexClose();
     }
 
+    void progressionOpen() {
+        progressionOpen_ = true;
+        view_.setProgressionOpen(true);
+    }
+
+    void progressionClose() {
+        progressionOpen_ = false;
+        view_.setProgressionOpen(false);
+    }
+
+    void buyUpgrade(int id) {
+        model_.buyUpgrade(id);
+    }
+
+    void buySkill(int id) {
+        model_.buySkill(id);
+    }
+
+    void doRebirth() {
+        int gained = model_.projectedRebirthEssence();
+        bool could = model_.canRebirth();
+        model_.doRebirth();
+        if (could) {
+            std::string msg = std::string(u8"\U0001F30C rebirth! +") + std::to_string(gained) + " essence";
+            js_show_toast(msg.c_str());
+        }
+    }
+
     void tick() {
         particles_.tick();
 
@@ -62,19 +88,23 @@ public:
         double dt = now - lastTick_;
         lastTick_ = now;
 
-        // Combo decays back to 1x once you stop clicking for a beat.
-        if (combo_ > 1.0 && now - lastComboClick_ > kComboWindowMs) {
+        // Combo decays back to 1x once you stop clicking for a beat,
+        // unless the Infinite Combo skill is owned.
+        if (combo_ > 1.0 && !model_.infiniteCombo() && now - lastComboClick_ > kComboWindowMs) {
             combo_ = 1.0;
             view_.setCombo(combo_);
         }
 
         // Passive income: once you've unlocked enough skins, points trickle
-        // in on their own, idle-game style.
-        if (model_.unlockedCount() >= kIdleUnlockCount) {
+        // in on their own, idle-game style. Interval and unlock threshold
+        // can both be improved via upgrades/skills.
+        if (model_.unlockedCount() >= model_.idleUnlockCount()) {
             idleAccumMs_ += dt;
-            while (idleAccumMs_ >= kIdleIntervalMs) {
-                idleAccumMs_ -= kIdleIntervalMs;
-                int points = std::max(1, (int) std::lround(kIdlePoints * model_.current().multiplier));
+            double interval = model_.idleIntervalMs();
+            while (idleAccumMs_ >= interval) {
+                idleAccumMs_ -= interval;
+                long points = (long) std::lround(kIdlePoints * model_.current().multiplier * model_.essenceMultiplier());
+                points = std::max(1L, points);
                 announceUnlocks(model_.registerPoints(points));
             }
         }
@@ -90,20 +120,27 @@ private:
 
     void registerClickAt(double x, double y) {
         double now = js_now();
+        double comboMax = kComboMax + model_.comboCapBonus();
 
         // Rapid clicks (within kComboWindowMs of each other) build a
-        // multiplier, capped at kComboMax; a pause resets it.
+        // multiplier, capped at comboMax; a pause resets it.
         if (now - lastComboClick_ <= kComboWindowMs) {
-            combo_ = std::min(kComboMax, combo_ + kComboStep);
+            combo_ = std::min(comboMax, combo_ + kComboStep);
         } else {
             combo_ = 1.0;
         }
         lastComboClick_ = now;
         view_.setCombo(combo_);
 
-        bool crit = ((double) rand() / RAND_MAX) < kCritChance;
+        double critChance = kCritChance + model_.critChanceBonus();
+        bool crit = ((double) rand() / RAND_MAX) < critChance;
+        int critMult = kCritMultiplier + model_.critDamageBonus();
         double skinMult = model_.current().multiplier;
-        int points = std::max(1, (int) std::lround(combo_ * skinMult * (crit ? kCritMultiplier : 1)));
+        double flat = model_.flatClickBonus();
+        double essenceMult = model_.essenceMultiplier();
+
+        long points = (long) std::lround((combo_ * skinMult + flat) * (crit ? critMult : 1) * essenceMult);
+        points = std::max(1L, points);
 
         auto justUnlocked = model_.registerPoints(points);
         particles_.burst(x, y, model_.current().particles, crit ? 22 : 12);
@@ -127,6 +164,7 @@ private:
     SkinView view_;
     ParticleSystem particles_;
     bool skindexOpen_ = false;
+    bool progressionOpen_ = false;
 
     double lastClick_ = 0.0;       // debounce guard (duplicate synthetic events)
     double lastComboClick_ = 0.0;  // combo window tracking
