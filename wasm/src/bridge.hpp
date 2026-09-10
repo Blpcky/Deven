@@ -37,6 +37,24 @@ EM_JS(void, js_set_click_count, (int n), {
     document.getElementById("click-count").textContent = String(n);
 });
 
+// ---------- combo readout ----------
+EM_JS(void, js_set_combo, (double multiplier), {
+    var el = document.getElementById("combo");
+    if (!el) return;
+    if (multiplier > 1.05) {
+        el.textContent = "x" + multiplier.toFixed(1) + " combo";
+        el.classList.add("show");
+    } else {
+        el.classList.remove("show");
+    }
+});
+
+// ---------- passive income indicator ----------
+EM_JS(void, js_set_idle_active, (int active), {
+    var el = document.getElementById("idle");
+    if (el) el.classList.toggle("show", !!active);
+});
+
 // ---------- toast ----------
 EM_JS(void, js_show_toast, (const char* text), {
     var el = document.getElementById("toast");

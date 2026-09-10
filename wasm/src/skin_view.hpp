@@ -9,6 +9,10 @@ class SkinView : public mvc::View {
 public:
     explicit SkinView(const SkinModel& model) : model_(model) {}
 
+    void setCombo(double multiplier) {
+        js_set_combo(multiplier);
+    }
+
     void setSkindexOpen(bool open) {
         skindexOpen_ = open;
         js_skindex_set_open(open ? 1 : 0);
@@ -21,6 +25,7 @@ public:
         js_set_accent(s.accent.c_str());
         js_set_skin_name(s.name.c_str());
         js_set_click_count(model_.clicks());
+        js_set_idle_active(model_.unlockedCount() >= kIdleUnlockCount ? 1 : 0);
         if (skindexOpen_) renderSkindex();
     }
 

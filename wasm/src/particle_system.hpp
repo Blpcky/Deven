@@ -17,8 +17,8 @@ struct Particle {
 // loop (one JS DOM write per particle per frame via the bridge).
 class ParticleSystem {
 public:
-    void burst(double cx, double cy, const std::array<std::string, 4>& colors) {
-        for (int i = 0; i < 12; i++) {
+    void burst(double cx, double cy, const std::array<std::string, 4>& colors, int count = 12) {
+        for (int i = 0; i < count; i++) {
             double angle = ((double) rand() / RAND_MAX) * 2.0 * M_PI;
             double dist = 50.0 + ((double) rand() / RAND_MAX) * 70.0;
             double size = 5.0 + ((double) rand() / RAND_MAX) * 5.0;

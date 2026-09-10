@@ -75,8 +75,17 @@
     font-size: 11px;
     color: var(--sage);
     opacity: 0.5;
-    margin: 0 0 40px;
+    margin: 0 0 8px;
   }
+  #idle {
+    font-size: 11px;
+    color: var(--accent);
+    opacity: 0;
+    height: 15px;
+    margin: 0 0 32px;
+    transition: opacity 0.4s ease, color 0.5s ease;
+  }
+  #idle.show { opacity: 0.75; }
 
   /* ---------- avatar ---------- */
   #avatar-frame {
@@ -101,10 +110,28 @@
     font-size: 12.5px;
     color: var(--sage);
     opacity: 0.75;
-    margin-bottom: 34px;
+    margin-bottom: 10px;
     transition: color 0.5s ease;
   }
   #avatar-stat b { color: var(--accent); font-weight: 600; transition: color 0.5s ease; }
+
+  #combo {
+    display: inline-block;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 16%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+    padding: 3px 10px;
+    border-radius: 999px;
+    opacity: 0;
+    transform: translateY(-3px) scale(0.9);
+    transition: opacity 0.2s ease, transform 0.2s ease, color 0.5s ease, background 0.5s ease, border-color 0.5s ease;
+    margin-bottom: 24px;
+    height: 20px;
+  }
+  #combo.show { opacity: 1; transform: translateY(0) scale(1); }
 
   .btn {
     display: inline-flex;
@@ -252,9 +279,11 @@
     <h1>Deven Ballback</h1>
     <p class="tagline">Collector of skins. Ballback by trade.</p>
     <p class="wasm-note">Skindex engine: C++ → WebAssembly</p>
+    <div id="idle">🪙 passive income active — +2 pts every few seconds</div>
 
     <div id="avatar-frame" title="click to earn progress"></div>
-    <div id="avatar-stat"><b id="skin-name"></b> · <span id="click-count">0</span> clicks</div>
+    <div id="avatar-stat"><b id="skin-name"></b> · <span id="click-count">0</span> pts</div>
+    <div id="combo"></div>
 
     <button class="btn" id="skindexbtn">Open Skindex</button>
 

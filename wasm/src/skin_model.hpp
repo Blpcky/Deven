@@ -6,6 +6,12 @@
 #include "mvc.hpp"
 #include "bridge.hpp"
 
+// Shared with SkinController (which drives the timer) and SkinView
+// (which shows/hides the "passive income" indicator once it's active).
+constexpr int kIdleUnlockCount = 5;   // skins unlocked before idle income kicks in
+constexpr double kIdleIntervalMs = 4000.0;
+constexpr int kIdlePoints = 2;
+
 struct Skin {
     int id;
     std::string name;
@@ -59,13 +65,16 @@ public:
         return n;
     }
 
-    // Returns the skin that just became unlocked by this click, or nullptr.
-    const Skin* registerClick() {
-        clicks_++;
+    // Adds `points` (already scaled by combo/crit multipliers upstream)
+    // and returns every skin whose threshold got crossed by this gain —
+    // usually zero or one, but a big crit can leapfrog more than one.
+    std::vector<const Skin*> registerPoints(int points) {
+        int before = clicks_;
+        clicks_ += points;
         js_set_int("skindex_clicks", clicks_);
-        const Skin* justUnlocked = nullptr;
+        std::vector<const Skin*> justUnlocked;
         for (auto& s : roster_) {
-            if (s.unlockAt == clicks_) { justUnlocked = &s; break; }
+            if (s.unlockAt > before && s.unlockAt <= clicks_) justUnlocked.push_back(&s);
         }
         notify();
         return justUnlocked;
