@@ -1,30 +1,202 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Deven</title>
-  <style>
-    :root { color-scheme: light dark; }
-    html, body {
-      height: 100%;
-      margin: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #0b0b0c;
-      color: #f5f5f5;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-    main { text-align: center; padding: 2rem; }
-    h1 { font-size: 2.5rem; margin-bottom: 0.5rem; letter-spacing: -0.02em; }
-    p { color: #999; margin: 0; }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deven</title>
+<style>
+  :root { color-scheme: dark; }
+  html, body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    background: #0a0a12;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    cursor: default;
+  }
+  body {
+    position: relative;
+    background: radial-gradient(circle at 50% 50%, #1a1030, #05050a 70%);
+    animation: bgshift 12s ease-in-out infinite alternate;
+  }
+  @keyframes bgshift {
+    0%   { filter: hue-rotate(0deg); }
+    100% { filter: hue-rotate(60deg); }
+  }
+
+  #logo {
+    position: absolute;
+    top: 0; left: 0;
+    font-size: clamp(28px, 6vw, 64px);
+    font-weight: 800;
+    letter-spacing: -1px;
+    white-space: nowrap;
+    user-select: none;
+    will-change: transform;
+    text-shadow: 0 0 20px currentColor;
+    transition: color 0.15s linear;
+  }
+
+  #hint {
+    position: absolute;
+    bottom: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #666;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    text-align: center;
+    user-select: none;
+  }
+
+  #counter {
+    position: absolute;
+    top: 18px;
+    right: 22px;
+    color: #888;
+    font-size: 13px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    user-select: none;
+  }
+
+  #message {
+    position: fixed;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    font-size: clamp(20px, 4vw, 36px);
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 0 24px rgba(255,255,255,0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    text-align: center;
+    padding: 0 20px;
+  }
+  #message.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  .particle {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    pointer-events: none;
+    top: 0; left: 0;
+    will-change: transform, opacity;
+  }
+</style>
 </head>
 <body>
-  <main>
-    <h1>Deven</h1>
-    <p>Coming soon.</p>
-  </main>
+  <div id="counter">clicks: 0</div>
+  <div id="logo">DEVEN</div>
+  <div id="message"></div>
+  <div id="hint">click around. it's fine, nothing bad will happen. probably.</div>
+
+<script>
+(function () {
+  // ---------- DVD-bounce logo ----------
+  var logo = document.getElementById('logo');
+  var x = Math.random() * (window.innerWidth - 200);
+  var y = Math.random() * (window.innerHeight - 100);
+  var dx = 2.4, dy = 2.1;
+  var colors = ['#ff5f6d', '#ffc371', '#4dd0e1', '#a78bfa', '#34d399', '#f472b6', '#60a5fa'];
+  var colorIdx = 0;
+  logo.style.color = colors[0];
+
+  function bounceColor() {
+    colorIdx = (colorIdx + 1) % colors.length;
+    logo.style.color = colors[colorIdx];
+  }
+
+  function tick() {
+    var w = logo.offsetWidth, h = logo.offsetHeight;
+    x += dx; y += dy;
+    if (x <= 0 || x + w >= window.innerWidth) { dx *= -1; x = Math.max(0, Math.min(x, window.innerWidth - w)); bounceColor(); }
+    if (y <= 0 || y + h >= window.innerHeight) { dy *= -1; y = Math.max(0, Math.min(y, window.innerHeight - h)); bounceColor(); }
+    logo.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+
+  // ---------- click fun ----------
+  var count = 0;
+  var counterEl = document.getElementById('counter');
+  var messageEl = document.getElementById('message');
+  var messages = [
+    "nice click.",
+    "again? bold.",
+    "ok we're doing this.",
+    "you have a lot of free time.",
+    "still here?",
+    "certified clicker ✨",
+    "i respect the dedication.",
+    "there's nothing else here, you know.",
+    "achievement unlocked: clicking",
+    "ok this is just a website.",
+    "10/10 click form.",
+    "the button does not do anything btw.",
+    "yes. very impressive.",
+    "you win. congrats.",
+    "seek help.",
+  ];
+
+  var msgTimeout;
+  function showMessage(text) {
+    clearTimeout(msgTimeout);
+    messageEl.textContent = text;
+    messageEl.classList.add('show');
+    msgTimeout = setTimeout(function () {
+      messageEl.classList.remove('show');
+    }, 900);
+  }
+
+  var particleColors = colors;
+  function burst(cx, cy) {
+    for (var i = 0; i < 14; i++) {
+      var p = document.createElement('div');
+      p.className = 'particle';
+      p.style.background = particleColors[Math.floor(Math.random() * particleColors.length)];
+      document.body.appendChild(p);
+      var angle = Math.random() * Math.PI * 2;
+      var dist = 60 + Math.random() * 90;
+      var tx = Math.cos(angle) * dist;
+      var ty = Math.sin(angle) * dist;
+      var start = performance.now();
+      var life = 500 + Math.random() * 300;
+      (function (p, tx, ty, start, life) {
+        function frame(now) {
+          var t = (now - start) / life;
+          if (t >= 1) { p.remove(); return; }
+          var ease = 1 - Math.pow(1 - t, 2);
+          p.style.transform = 'translate(' + (cx + tx * ease) + 'px,' + (cy + ty * ease - t * 40) + 'px)';
+          p.style.opacity = 1 - t;
+          requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+      })(p, tx, ty, start, life);
+    }
+  }
+
+  document.addEventListener('click', function (e) {
+    count++;
+    counterEl.textContent = 'clicks: ' + count;
+    burst(e.clientX, e.clientY);
+    var idx = Math.min(count - 1, messages.length - 1);
+    showMessage(messages[idx] || messages[messages.length - 1]);
+    if (count === messages.length) {
+      document.getElementById('hint').textContent = "ok you've seen all the messages. go outside.";
+    }
+  });
+
+  window.addEventListener('resize', function () {
+    x = Math.min(x, window.innerWidth - logo.offsetWidth);
+    y = Math.min(y, window.innerHeight - logo.offsetHeight);
+  });
+})();
+</script>
 </body>
 </html>
