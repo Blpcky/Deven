@@ -26,9 +26,9 @@
 </style>
 <style>
   :root {
-    --bg1: #3a2418;
-    --bg2: #0c0705;
-    --accent: #e8b48a;
+    --bg1: #3a2818;
+    --bg2: #0c0805;
+    --accent: #ffb98a;
     color-scheme: dark;
   }
   html, body {
@@ -67,7 +67,7 @@
     transition: color 0.6s ease;
   }
 
-  #skinbtn {
+  #skindexbtn {
     position: absolute;
     top: 14px;
     left: 18px;
@@ -85,9 +85,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: 10;
   }
-  #skinbtn:hover { background: rgba(255,255,255,0.16); transform: translateY(-1px); }
-  #skinbtn:active { transform: translateY(0) scale(0.92); }
+  #skindexbtn:hover { background: rgba(255,255,255,0.16); transform: translateY(-1px); }
+  #skindexbtn:active { transform: translateY(0) scale(0.92); }
 
   .particle {
     position: fixed;
@@ -111,44 +112,202 @@
     0%   { opacity: 0.9; clip-path: inset(0 0 0 0); }
     100% { opacity: 0; clip-path: inset(0 100% 0 0); }
   }
+
+  /* ---------- unlock toast ---------- */
+  #toast {
+    position: fixed;
+    top: 14%;
+    left: 50%;
+    transform: translate(-50%, -12px);
+    font-size: 15px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    letter-spacing: 0.02em;
+    color: #fff;
+    background: rgba(0,0,0,0.55);
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 10px 16px;
+    border-radius: 10px;
+    backdrop-filter: blur(6px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    text-align: center;
+    white-space: nowrap;
+    z-index: 20;
+  }
+  #toast.show {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  /* ---------- skindex overlay ---------- */
+  #skindex-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.72);
+    backdrop-filter: blur(8px);
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    overflow-y: auto;
+    padding: 40px 16px;
+  }
+  #skindex-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  #skindex-panel {
+    width: min(560px, 100%);
+    color: #eee;
+    text-align: center;
+  }
+  #skindex-panel h2 {
+    font-size: 22px;
+    letter-spacing: 0.12em;
+    margin: 0 0 4px;
+    color: var(--accent);
+    transition: color 0.6s ease;
+  }
+  #skindex-sub {
+    font-size: 13px;
+    color: #999;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    margin-bottom: 22px;
+  }
+  #skindex-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+    gap: 12px;
+  }
+  .skindex-tile {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 12px;
+    padding: 14px 8px 10px;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease, border-color 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .skindex-tile:hover { background: rgba(255,255,255,0.12); transform: translateY(-2px); }
+  .skindex-tile.active { border-color: var(--accent); }
+  .skindex-tile.locked { cursor: default; opacity: 0.55; }
+  .skindex-tile.locked:hover { background: rgba(255,255,255,0.06); transform: none; }
+  .skindex-emoji { font-size: 34px; line-height: 1; }
+  .skindex-name {
+    font-size: 11px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    color: #ccc;
+  }
+  .skindex-lock {
+    font-size: 10px;
+    color: #888;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  #skindex-close {
+    margin-top: 26px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.18);
+    color: #eee;
+    font-size: 13px;
+    font-family: inherit;
+    padding: 9px 20px;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  #skindex-close:hover { background: rgba(255,255,255,0.16); }
 </style>
 </head>
 <body>
   <h1 class="visually-hidden">Deven Ballback's Skin Game</h1>
-  <p class="visually-hidden">The personal website of Deven Ballback, at devenballback.skin.</p>
-  <button id="skinbtn" title="change skin">🧬</button>
+  <p class="visually-hidden">The personal website of Deven Ballback, at devenballback.skin. Click around to earn clicks and unlock new skins in the Skindex.</p>
+  <button id="skindexbtn" title="open Skindex">📖</button>
   <div id="counter">0</div>
   <div id="blob"></div>
+  <div id="toast"></div>
+
+  <div id="skindex-overlay">
+    <div id="skindex-panel">
+      <h2>SKINDEX</h2>
+      <div id="skindex-sub"></div>
+      <div id="skindex-grid"></div>
+      <button id="skindex-close">close</button>
+    </div>
+  </div>
 
 <script>
 (function () {
+  // ---------- skin roster ----------
+  // A diverse cast of humans — different ages, features, and skin tones —
+  // unlocked progressively the more you click around.
   var skins = [
-    { name: "human skin",     bg1: "#3a2418", bg2: "#0c0705", accent: "#e8b48a", particles: ["#e8b48a", "#d99a6c", "#c47a4e", "#fddbb0"], emoji: "🧑" },
-    { name: "snake skin",     bg1: "#0f2e1a", bg2: "#020805", accent: "#3ddc73", particles: ["#3ddc73", "#1f9d55", "#a8e063", "#0b5d2e"], emoji: "🐍" },
-    { name: "banana peel",    bg1: "#4a3a05", bg2: "#0a0700", accent: "#ffe066", particles: ["#ffe066", "#ffd23f", "#fff3b0", "#c9a600"], emoji: "🍌" },
-    { name: "orange peel",    bg1: "#4a2405", bg2: "#0a0400", accent: "#ff9f45", particles: ["#ff9f45", "#ff8113", "#ffcf9c", "#c9660a"], emoji: "🍊" },
-    { name: "grape skin",     bg1: "#2a0f3a", bg2: "#08020a", accent: "#c77dff", particles: ["#c77dff", "#9d4edd", "#e0aaff", "#5a189a"], emoji: "🍇" },
-    { name: "potato skin",    bg1: "#3a2f1a", bg2: "#0a0805", accent: "#c9a36a", particles: ["#c9a36a", "#a67c3d", "#e8d3a8", "#7c5a24"], emoji: "🥔" },
-    { name: "onion skin",     bg1: "#3a1a2a", bg2: "#0a0308", accent: "#e6a8cf", particles: ["#e6a8cf", "#c96ba0", "#f5d6e8", "#8f3d6b"], emoji: "🧅" },
-    { name: "drum skin",      bg1: "#2a1c0f", bg2: "#080502", accent: "#e0c9a0", particles: ["#e0c9a0", "#b89563", "#f5ead2", "#7c5a30"], emoji: "🥁" },
-    { name: "gator skin",     bg1: "#0f2a1c", bg2: "#020805", accent: "#7ba05b", particles: ["#7ba05b", "#4f6b39", "#a8c98a", "#2e3d20"], emoji: "🐊" },
-    { name: "dragon scales",  bg1: "#3a0c0c", bg2: "#0a0202", accent: "#ff8c42", particles: ["#ff4d4d", "#ff8c42", "#ffcf5c", "#c0392b"], emoji: "🐉" },
-    { name: "robot chassis",  bg1: "#1a1030", bg2: "#05050a", accent: "#4dd0e1", particles: ["#ff5f6d", "#ffc371", "#4dd0e1", "#a78bfa"], emoji: "🤖" },
-    { name: "shed skin",      bg1: "#1c1c1c", bg2: "#050505", accent: "#cfd8dc", particles: ["#cfd8dc", "#90a4ae", "#eceff1", "#607d8b"], emoji: "🫙" }
+    { id: 0, name: "Skin #01", emoji: "🧑🏻", unlockAt: 0,   bg1: "#3a2818", bg2: "#0c0805", accent: "#ffb98a", particles: ["#ffb98a", "#e69a63", "#ffd9b8", "#c97a3f"] },
+    { id: 1, name: "Skin #02", emoji: "🧑🏼", unlockAt: 5,   bg1: "#3a2f05", bg2: "#0a0700", accent: "#f2c14e", particles: ["#f2c14e", "#d9a52e", "#ffe08a", "#a67c1a"] },
+    { id: 2, name: "Skin #03", emoji: "🧑🏽", unlockAt: 12,  bg1: "#3a1010", bg2: "#0a0303", accent: "#ff6b6b", particles: ["#ff6b6b", "#e04545", "#ff9e9e", "#b32c2c"] },
+    { id: 3, name: "Skin #04", emoji: "🧑🏾", unlockAt: 22,  bg1: "#22103a", bg2: "#06020a", accent: "#9d7fff", particles: ["#9d7fff", "#7d5be0", "#c6b3ff", "#5a3dbf"] },
+    { id: 4, name: "Skin #05", emoji: "🧑🏿", unlockAt: 35,  bg1: "#0a2e2c", bg2: "#020807", accent: "#4bd2c9", particles: ["#4bd2c9", "#2ea89f", "#8cf0e6", "#1c7e77"] },
+    { id: 5, name: "Skin #06", emoji: "👶🏽", unlockAt: 52,  bg1: "#3a1028", bg2: "#0a0208", accent: "#ff8fc7", particles: ["#ff8fc7", "#e0609f", "#ffc2e0", "#b83d7c"] },
+    { id: 6, name: "Skin #07", emoji: "🧓🏻", unlockAt: 72,  bg1: "#1c1c1c", bg2: "#050505", accent: "#cfd8dc", particles: ["#cfd8dc", "#90a4ae", "#eceff1", "#607d8b"] },
+    { id: 7, name: "Skin #08", emoji: "🧔🏾", unlockAt: 95,  bg1: "#2f2205", bg2: "#080601", accent: "#d99a3d", particles: ["#d99a3d", "#b87c22", "#f0c57a", "#8f5f14"] },
+    { id: 8, name: "Skin #09", emoji: "🧑🏿‍🦱", unlockAt: 120, bg1: "#3a0c14", bg2: "#0a0204", accent: "#ff4d6d", particles: ["#ff4d6d", "#d92e4d", "#ff8fa3", "#a3132c"] }
   ];
-  var skinIdx = 0;
+
+  // ---------- persistence ----------
+  var STORAGE_CLICKS = 'skindex_clicks';
+  var STORAGE_CURRENT = 'skindex_current';
+
+  function loadClicks() {
+    try {
+      var v = parseInt(localStorage.getItem(STORAGE_CLICKS), 10);
+      return isNaN(v) ? 0 : v;
+    } catch (e) { return 0; }
+  }
+  function saveClicks(v) {
+    try { localStorage.setItem(STORAGE_CLICKS, String(v)); } catch (e) {}
+  }
+  function loadCurrent() {
+    try {
+      var v = parseInt(localStorage.getItem(STORAGE_CURRENT), 10);
+      return isNaN(v) ? 0 : v;
+    } catch (e) { return 0; }
+  }
+  function saveCurrent(v) {
+    try { localStorage.setItem(STORAGE_CURRENT, String(v)); } catch (e) {}
+  }
+
+  function isUnlocked(skin, clicks) { return clicks >= skin.unlockAt; }
+  function unlockedSkins(clicks) { return skins.filter(function (s) { return isUnlocked(s, clicks); }); }
+
+  var count = loadClicks();
+  var skinIdx = loadCurrent();
+  if (!isUnlocked(skins[skinIdx], count)) skinIdx = 0;
+
   var root = document.documentElement;
   var blob = document.getElementById('blob');
-  var skinbtn = document.getElementById('skinbtn');
+  var skindexbtn = document.getElementById('skindexbtn');
   var body = document.body;
+  var counterEl = document.getElementById('counter');
+  var toastEl = document.getElementById('toast');
+  var overlay = document.getElementById('skindex-overlay');
+  var grid = document.getElementById('skindex-grid');
+  var sub = document.getElementById('skindex-sub');
+  var closeBtn = document.getElementById('skindex-close');
 
   function applySkin(i, animate) {
     var s = skins[i];
+    skinIdx = i;
+    saveCurrent(i);
     root.style.setProperty('--bg1', s.bg1);
     root.style.setProperty('--bg2', s.bg2);
     root.style.setProperty('--accent', s.accent);
     blob.textContent = s.emoji;
-    skinbtn.title = 'change skin (currently: ' + s.name + ')';
+    skindexbtn.title = 'open Skindex (current: ' + s.name + ')';
     if (animate) {
       var peel = document.createElement('div');
       peel.className = 'peel show';
@@ -157,16 +316,62 @@
       setTimeout(function () { peel.remove(); }, 750);
     }
   }
-  applySkin(0, false);
+  applySkin(skinIdx, false);
+  counterEl.textContent = count;
 
-  var lastSkinClick = 0;
-  skinbtn.addEventListener('click', function (e) {
+  // ---------- toast ----------
+  var toastTimeout;
+  function showToast(text) {
+    clearTimeout(toastTimeout);
+    toastEl.textContent = text;
+    toastEl.classList.add('show');
+    toastTimeout = setTimeout(function () { toastEl.classList.remove('show'); }, 2200);
+  }
+
+  // ---------- skindex overlay ----------
+  function renderSkindex() {
+    var unlockedCount = unlockedSkins(count).length;
+    sub.textContent = unlockedCount + ' / ' + skins.length + ' unlocked';
+    grid.innerHTML = '';
+    skins.forEach(function (s) {
+      var unlocked = isUnlocked(s, count);
+      var tile = document.createElement('div');
+      tile.className = 'skindex-tile' + (unlocked ? '' : ' locked') + (unlocked && s.id === skinIdx ? ' active' : '');
+      if (unlocked) {
+        tile.innerHTML = '<div class="skindex-emoji">' + s.emoji + '</div><div class="skindex-name">' + s.name + '</div>';
+        tile.addEventListener('click', function (e) {
+          e.stopPropagation();
+          applySkin(s.id, true);
+          closeSkindex();
+        });
+      } else {
+        tile.innerHTML = '<div class="skindex-emoji">❔</div><div class="skindex-name">???</div><div class="skindex-lock">🔒 ' + s.unlockAt + ' clicks</div>';
+      }
+      grid.appendChild(tile);
+    });
+  }
+
+  function openSkindex() {
+    renderSkindex();
+    overlay.classList.add('show');
+  }
+  function closeSkindex() {
+    overlay.classList.remove('show');
+  }
+
+  skindexbtn.addEventListener('click', function (e) {
     e.stopPropagation();
-    var now = performance.now();
-    if (now - lastSkinClick < 60) return;
-    lastSkinClick = now;
-    skinIdx = (skinIdx + 1) % skins.length;
-    applySkin(skinIdx, true);
+    openSkindex();
+  });
+  closeBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    closeSkindex();
+  });
+  overlay.addEventListener('click', function (e) {
+    if (e.target === overlay) {
+      e.stopPropagation();
+      closeSkindex();
+    }
   });
 
   // ---------- bounce ----------
@@ -185,9 +390,6 @@
   requestAnimationFrame(tick);
 
   // ---------- click fun ----------
-  var count = 0;
-  var counterEl = document.getElementById('counter');
-
   function burst(cx, cy) {
     var pal = skins[skinIdx].particles;
     for (var i = 0; i < 14; i++) {
@@ -220,13 +422,21 @@
 
   var lastClickTime = 0;
   document.addEventListener('click', function (e) {
-    if (e.target === skinbtn) return;
+    if (overlay.classList.contains('show')) return;
+    if (e.target === skindexbtn) return;
     var now = performance.now();
     if (now - lastClickTime < 60) return; // debounce duplicate synthetic events
     lastClickTime = now;
+
     count++;
+    saveClicks(count);
     counterEl.textContent = count;
     burst(e.clientX, e.clientY);
+
+    var justUnlocked = skins.find(function (s) { return s.unlockAt === count; });
+    if (justUnlocked) {
+      showToast('🔓 new skin unlocked — ' + justUnlocked.name);
+    }
   });
 
   window.addEventListener('resize', function () {
