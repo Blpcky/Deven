@@ -16,7 +16,13 @@ extern "C" {
 EMSCRIPTEN_KEEPALIVE
 void app_init() {
     g_controller = std::make_unique<SkinController>();
-    emscripten_set_main_loop(main_loop, 0, 1);
+    // simulate_infinite_loop=0: we don't need it (nothing follows this
+    // call), and =1 makes Emscripten throw a JS exception to unwind the
+    // C++ stack — fine when its own runtime calls app_init, but fatal
+    // here since we invoke it via Module.ccall() ourselves and that
+    // exception would otherwise escape into our caller and abort the
+    // rest of the JS setup (event listeners never get attached).
+    emscripten_set_main_loop(main_loop, 0, 0);
 }
 
 EMSCRIPTEN_KEEPALIVE
