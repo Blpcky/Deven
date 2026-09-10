@@ -59,9 +59,10 @@
   #counter {
     position: absolute;
     top: 18px;
-    right: 22px;
+    right: 26px;
     color: var(--accent);
-    font-size: 14px;
+    font-size: 34px;
+    font-weight: 700;
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     user-select: none;
     transition: color 0.6s ease;
@@ -74,10 +75,10 @@
     background: rgba(255,255,255,0.08);
     border: 1px solid rgba(255,255,255,0.18);
     color: var(--accent);
-    font-size: 16px;
+    font-size: 30px;
     line-height: 1;
-    width: 36px;
-    height: 36px;
+    width: 62px;
+    height: 62px;
     border-radius: 999px;
     cursor: pointer;
     backdrop-filter: blur(6px);
@@ -247,15 +248,15 @@
   // A diverse cast of humans — different ages, features, and skin tones —
   // unlocked progressively the more you click around.
   var skins = [
-    { id: 0, name: "Skin #01", emoji: "🧑🏻", unlockAt: 0,   bg1: "#3a2818", bg2: "#0c0805", accent: "#ffb98a", particles: ["#ffb98a", "#e69a63", "#ffd9b8", "#c97a3f"] },
-    { id: 1, name: "Skin #02", emoji: "🧑🏼", unlockAt: 5,   bg1: "#3a2f05", bg2: "#0a0700", accent: "#f2c14e", particles: ["#f2c14e", "#d9a52e", "#ffe08a", "#a67c1a"] },
-    { id: 2, name: "Skin #03", emoji: "🧑🏽", unlockAt: 12,  bg1: "#3a1010", bg2: "#0a0303", accent: "#ff6b6b", particles: ["#ff6b6b", "#e04545", "#ff9e9e", "#b32c2c"] },
-    { id: 3, name: "Skin #04", emoji: "🧑🏾", unlockAt: 22,  bg1: "#22103a", bg2: "#06020a", accent: "#9d7fff", particles: ["#9d7fff", "#7d5be0", "#c6b3ff", "#5a3dbf"] },
-    { id: 4, name: "Skin #05", emoji: "🧑🏿", unlockAt: 35,  bg1: "#0a2e2c", bg2: "#020807", accent: "#4bd2c9", particles: ["#4bd2c9", "#2ea89f", "#8cf0e6", "#1c7e77"] },
-    { id: 5, name: "Skin #06", emoji: "👶🏽", unlockAt: 52,  bg1: "#3a1028", bg2: "#0a0208", accent: "#ff8fc7", particles: ["#ff8fc7", "#e0609f", "#ffc2e0", "#b83d7c"] },
-    { id: 6, name: "Skin #07", emoji: "🧓🏻", unlockAt: 72,  bg1: "#1c1c1c", bg2: "#050505", accent: "#cfd8dc", particles: ["#cfd8dc", "#90a4ae", "#eceff1", "#607d8b"] },
-    { id: 7, name: "Skin #08", emoji: "🧔🏾", unlockAt: 95,  bg1: "#2f2205", bg2: "#080601", accent: "#d99a3d", particles: ["#d99a3d", "#b87c22", "#f0c57a", "#8f5f14"] },
-    { id: 8, name: "Skin #09", emoji: "🧑🏿‍🦱", unlockAt: 120, bg1: "#3a0c14", bg2: "#0a0204", accent: "#ff4d6d", particles: ["#ff4d6d", "#d92e4d", "#ff8fa3", "#a3132c"] }
+    { id: 0, name: "Skin #01", emoji: "🧑🏻", unlockAt: 0,     bg1: "#3a2818", bg2: "#0c0805", accent: "#ffb98a", particles: ["#ffb98a", "#e69a63", "#ffd9b8", "#c97a3f"] },
+    { id: 1, name: "Skin #02", emoji: "🧑🏼", unlockAt: 100,   bg1: "#3a2f05", bg2: "#0a0700", accent: "#f2c14e", particles: ["#f2c14e", "#d9a52e", "#ffe08a", "#a67c1a"] },
+    { id: 2, name: "Skin #03", emoji: "🧑🏽", unlockAt: 300,   bg1: "#3a1010", bg2: "#0a0303", accent: "#ff6b6b", particles: ["#ff6b6b", "#e04545", "#ff9e9e", "#b32c2c"] },
+    { id: 3, name: "Skin #04", emoji: "🧑🏾", unlockAt: 750,   bg1: "#22103a", bg2: "#06020a", accent: "#9d7fff", particles: ["#9d7fff", "#7d5be0", "#c6b3ff", "#5a3dbf"] },
+    { id: 4, name: "Skin #05", emoji: "🧑🏿", unlockAt: 1500,  bg1: "#0a2e2c", bg2: "#020807", accent: "#4bd2c9", particles: ["#4bd2c9", "#2ea89f", "#8cf0e6", "#1c7e77"] },
+    { id: 5, name: "Skin #06", emoji: "👶🏽", unlockAt: 3000,  bg1: "#3a1028", bg2: "#0a0208", accent: "#ff8fc7", particles: ["#ff8fc7", "#e0609f", "#ffc2e0", "#b83d7c"] },
+    { id: 6, name: "Skin #07", emoji: "🧓🏻", unlockAt: 5500,  bg1: "#1c1c1c", bg2: "#050505", accent: "#cfd8dc", particles: ["#cfd8dc", "#90a4ae", "#eceff1", "#607d8b"] },
+    { id: 7, name: "Skin #08", emoji: "🧔🏾", unlockAt: 9000,  bg1: "#2f2205", bg2: "#080601", accent: "#d99a3d", particles: ["#d99a3d", "#b87c22", "#f0c57a", "#8f5f14"] },
+    { id: 8, name: "Skin #09", emoji: "🧑🏿‍🦱", unlockAt: 15000, bg1: "#3a0c14", bg2: "#0a0204", accent: "#ff4d6d", particles: ["#ff4d6d", "#d92e4d", "#ff8fa3", "#a3132c"] }
   ];
 
   // ---------- persistence ----------
