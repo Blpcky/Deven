@@ -75,8 +75,13 @@ public:
             js_show_toast(msg.c_str());
             return;
         }
+        int equippedBefore = model_.current().id;
         model_.buyUpgrade(id);
         std::string msg = u8"\U00002B06\U0000FE0F " + u.name + " -> Lv " + std::to_string(model_.upgradeLevel(id));
+        if (model_.current().id != equippedBefore) {
+            msg += u8" — \U0001F512 " + model_.roster()[equippedBefore].name +
+                   " re-locked, back to " + model_.current().name;
+        }
         js_show_toast(msg.c_str());
     }
 

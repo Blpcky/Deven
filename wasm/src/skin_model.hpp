@@ -158,6 +158,7 @@ public:
         upgradeLevels_[id]++;
         js_set_int("skindex_clicks", (int) clicks_);
         js_set_int(("skindex_upg" + std::to_string(id)).c_str(), upgradeLevels_[id]);
+        reequipIfLocked();
         notify();
         return true;
     }
@@ -226,6 +227,15 @@ public:
     }
 
 private:
+    // Spending points (upgrades) can drop you below the equipped skin's
+    // unlock threshold. Call after anything that can reduce clicks_.
+    void reequipIfLocked() {
+        if (!isUnlocked(currentId_)) {
+            currentId_ = 0;
+            js_set_int("skindex_current", 0);
+        }
+    }
+
     std::vector<Skin> roster_;
     long clicks_ = 0;
     int currentId_ = 0;
