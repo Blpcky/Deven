@@ -12,7 +12,7 @@
 constexpr int kIdleUnlockCount = 5;   // skins unlocked before idle income kicks in (before Idle Mastery)
 constexpr double kIdleIntervalMs = 4000.0;
 constexpr int kIdlePoints = 2;
-constexpr int kRebirthMinPoints = 500; // must have banked this many points to rebirth
+constexpr int kRebirthMinPoints = 3000; // must have banked this many points to rebirth
 
 struct Skin {
     int id;
@@ -52,31 +52,31 @@ public:
     SkinModel() {
         roster_ = {
             {0, "Skin #01", u8"\U0001F9D1\U0001F3FB", 0,     "#ffb98a", {"#ffb98a", "#e69a63", "#ffd9b8", "#c97a3f"}, 1.0},
-            {1, "Skin #02", u8"\U0001F9D1\U0001F3FC", 100,   "#f2c14e", {"#f2c14e", "#d9a52e", "#ffe08a", "#a67c1a"}, 1.2},
-            {2, "Skin #03", u8"\U0001F9D1\U0001F3FD", 300,   "#ff6b6b", {"#ff6b6b", "#e04545", "#ff9e9e", "#b32c2c"}, 1.5},
-            {3, "Skin #04", u8"\U0001F9D1\U0001F3FE", 750,   "#9d7fff", {"#9d7fff", "#7d5be0", "#c6b3ff", "#5a3dbf"}, 2.0},
-            {4, "Skin #05", u8"\U0001F9D1\U0001F3FF", 1500,  "#4bd2c9", {"#4bd2c9", "#2ea89f", "#8cf0e6", "#1c7e77"}, 2.5},
-            {5, "Skin #06", u8"\U0001F476\U0001F3FD", 3000,  "#ff8fc7", {"#ff8fc7", "#e0609f", "#ffc2e0", "#b83d7c"}, 3.5},
-            {6, "Skin #07", u8"\U0001F9D3\U0001F3FB", 5500,  "#cfd8dc", {"#cfd8dc", "#90a4ae", "#eceff1", "#607d8b"}, 5.0},
-            {7, "Skin #08", u8"\U0001F9D4\U0001F3FE", 9000,  "#d99a3d", {"#d99a3d", "#b87c22", "#f0c57a", "#8f5f14"}, 7.0},
-            {8, "Skin #09", u8"\U0001F9D1\U0001F3FF\U0000200D\U0001F9B1", 15000, "#ff4d6d", {"#ff4d6d", "#d92e4d", "#ff8fa3", "#a3132c"}, 10.0},
+            {1, "Skin #02", u8"\U0001F9D1\U0001F3FC", 400,   "#f2c14e", {"#f2c14e", "#d9a52e", "#ffe08a", "#a67c1a"}, 1.2},
+            {2, "Skin #03", u8"\U0001F9D1\U0001F3FD", 1200,  "#ff6b6b", {"#ff6b6b", "#e04545", "#ff9e9e", "#b32c2c"}, 1.5},
+            {3, "Skin #04", u8"\U0001F9D1\U0001F3FE", 3000,  "#9d7fff", {"#9d7fff", "#7d5be0", "#c6b3ff", "#5a3dbf"}, 2.0},
+            {4, "Skin #05", u8"\U0001F9D1\U0001F3FF", 6000,  "#4bd2c9", {"#4bd2c9", "#2ea89f", "#8cf0e6", "#1c7e77"}, 2.5},
+            {5, "Skin #06", u8"\U0001F476\U0001F3FD", 12000, "#ff8fc7", {"#ff8fc7", "#e0609f", "#ffc2e0", "#b83d7c"}, 3.5},
+            {6, "Skin #07", u8"\U0001F9D3\U0001F3FB", 22000, "#cfd8dc", {"#cfd8dc", "#90a4ae", "#eceff1", "#607d8b"}, 5.0},
+            {7, "Skin #08", u8"\U0001F9D4\U0001F3FE", 36000, "#d99a3d", {"#d99a3d", "#b87c22", "#f0c57a", "#8f5f14"}, 7.0},
+            {8, "Skin #09", u8"\U0001F9D1\U0001F3FF\U0000200D\U0001F9B1", 60000, "#ff4d6d", {"#ff4d6d", "#d92e4d", "#ff8fa3", "#a3132c"}, 10.0},
         };
 
         upgradeDefs_ = {
-            {0, "Thicker Skin",     "+1 flat point per click",            50,  1.4, 10},
-            {1, "Combo Flex",       "+0.5 combo cap",                     100, 1.5, 5},
-            {2, "Fast Metabolism",  "-300ms idle income interval",        150, 1.6, 10},
-            {3, "Lucky Skin",       "+1.5% critical hit chance",          120, 1.5, 10},
-            {4, "Crit Power",       "+1 critical hit multiplier",         200, 1.7, 10},
+            {0, "Thicker Skin",     "+1 flat point per click",            80,  1.5,  15},
+            {1, "Combo Flex",       "+0.5 combo cap",                     180, 1.6,  6},
+            {2, "Fast Metabolism",  "-300ms idle income interval",        250, 1.65, 12},
+            {3, "Lucky Skin",       "+1.5% critical hit chance",          200, 1.55, 14},
+            {4, "Crit Power",       "+1 critical hit multiplier",         320, 1.75, 12},
         };
 
         skillDefs_ = {
-            {0, "Thick Skinned",     "Start each rebirth with +100 points",        1, 1, {}},
-            {1, "Sticky Aura",       "+10% essence earned per rebirth",            1, 1, {}},
-            {2, "Skin Deep Discount","-15% upgrade costs",                         2, 2, {0, 1}},
-            {3, "Molting Season",    "Idle income needs only 3 skins, not 5",      2, 2, {0, 1}},
-            {4, "Reskinned",         "+0.5 permanent global point multiplier",     4, 3, {2, 3}},
-            {5, "Rhino Hide",        "Combo multiplier never decays",              4, 3, {2, 3}},
+            {0, "Thick Skinned",     "Start each rebirth with +100 points",        3, 1, {}},
+            {1, "Sticky Aura",       "+10% essence earned per rebirth",            3, 1, {}},
+            {2, "Skin Deep Discount","-15% upgrade costs",                         6, 2, {0, 1}},
+            {3, "Molting Season",    "Idle income needs only 3 skins, not 5",      6, 2, {0, 1}},
+            {4, "Reskinned",         "+0.5 permanent global point multiplier",     12, 3, {2, 3}},
+            {5, "Rhino Hide",        "Combo multiplier never decays",              12, 3, {2, 3}},
         };
 
         clicks_ = js_get_int("skindex_clicks", 0);
